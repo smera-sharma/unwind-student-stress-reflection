@@ -1,22 +1,13 @@
 from typing import Generator
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from app.core.database import SessionLocal
+from app.core.database import get_db
 from app.models.user import User
 
 # JWT token request header scheme resolver definition (points to login endpoint)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
-def get_db() -> Generator:
-    """
-    SQLAlchemy database connection session generator.
-    Closes the connection context after request completion.
-    """
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
     """
