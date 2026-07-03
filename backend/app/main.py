@@ -46,9 +46,10 @@ if settings.BACKEND_CORS_ORIGINS:
 # Register master router paths under /api/v1 prefix
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-from app.api.v1.endpoints import ai, profile
+from app.api.v1.endpoints import ai, profile, insights
 app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
 app.include_router(profile.router, prefix="/api", tags=["profile"])
+app.include_router(insights.router, prefix="/api/ai", tags=["ai"])
 
 @app.get("/", tags=["health"])
 def health_check():

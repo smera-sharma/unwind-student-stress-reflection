@@ -42,9 +42,14 @@ const Navbar = () => {
             About
           </a>
           {isAuthenticated && (
-            <Link to="/dashboard" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
-              Dashboard
-            </Link>
+            <>
+              <Link to="/dashboard" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
+                Dashboard
+              </Link>
+              <Link to="/insights" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
+                Insights
+              </Link>
+            </>
           )}
         </div>
 
@@ -69,6 +74,13 @@ const Navbar = () => {
                     className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                   >
                     🏠 Dashboard
+                  </Link>
+                  <Link 
+                    to="/insights" 
+                    onClick={() => setDropdownOpen(false)}
+                    className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
+                  >
+                    📊 Insights
                   </Link>
                   <Link 
                     to="/profile" 
@@ -146,6 +158,13 @@ const Navbar = () => {
                 className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
               >
                 Dashboard
+              </Link>
+              <Link
+                to="/insights"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
+              >
+                Insights
               </Link>
               <Link
                 to="/profile"
