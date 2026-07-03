@@ -7,13 +7,13 @@
 
 @layer base {
   body {
-    @apply bg-unwind-bg text-unwind-text-primary font-sans antialiased;
+    @apply bg-unwind-bg text-unwind-text-primary font-sans antialiased dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
     margin: 0;
     line-height: 1.7; /* Generous line spacing for readability */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight;
+    @apply font-heading tracking-tight text-[#2F3A3F] dark:text-slate-100;
   }
 }
 
@@ -39,4 +39,39 @@
 .animate-breathe {
   animation: breathe 8s ease-in-out infinite;
 }
+
+/* Global Dark Mode Hex Overrides */
+.dark .text-\[\#2F3A3F\] {
+  color: #f1f5f9 !important; /* text-slate-100 */
+}
+.dark .text-\[\#6B7280\] {
+  color: #94a3b8 !important; /* text-slate-400 */
+}
+.dark .bg-white {
+  background-color: #020617 !important; /* bg-slate-950 */
+}
+.dark .bg-\[\#FAF9F6\] {
+  background-color: #090d16 !important; /* dark slate bg */
+}
+.dark .bg-\[\#FAF7F2\] {
+  background-color: #0f172a !important; /* bg-slate-900 */
+}
+.dark .border-\[\#E5E7EB\] {
+  border-color: #1e293b !important; /* border-slate-800 */
+}
+.dark input, .dark textarea, .dark select {
+  background-color: #090d16 !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+.dark hr {
+  border-color: #1e293b !important;
+}
+
+/* Accessibility outline rings */
+:focus-visible {
+  outline: 2px solid #6B8E7A !important;
+  outline-offset: 2px;
+}
+
 

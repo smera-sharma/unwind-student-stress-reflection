@@ -5,6 +5,7 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
+import Profile from '../pages/Profile';
 import NotFound from '../pages/NotFound';
 
 const AppRoutes = () => {
@@ -20,6 +21,7 @@ const AppRoutes = () => {
       {/* Protected Routes (JWT-Ready Structure) */}
       <Route element={<ProtectedLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/profile" element={<Profile />} />
       </Route>
 
       {/* Fallback Catch-All Route */}

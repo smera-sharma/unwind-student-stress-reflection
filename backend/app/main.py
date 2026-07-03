@@ -5,6 +5,23 @@ from app.core.database import engine
 from app.models.base import Base
 from app.api.v1.router import api_router
 
+# Reset SQLite database if schema mismatch (column display_name missing)
+import os
+import sqlite3
+if os.path.exists("./unwind.db"):
+    try:
+        conn = sqlite3.connect("./unwind.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT display_name FROM users LIMIT 1")
+        conn.close()
+    except sqlite3.OperationalError:
+        try:
+            conn.close()
+            os.remove("./unwind.db")
+            print("Successfully initialized new user columns in database.")
+        except Exception:
+            pass
+
 # Create SQLite database tables on startup (if not already existing)
 Base.metadata.create_all(bind=engine)
 
@@ -29,8 +46,9 @@ if settings.BACKEND_CORS_ORIGINS:
 # Register master router paths under /api/v1 prefix
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
-from app.api.v1.endpoints import ai
+from app.api.v1.endpoints import ai, profile
 app.include_router(ai.router, prefix="/api/ai", tags=["ai"])
+app.include_router(profile.router, prefix="/api", tags=["profile"])
 
 @app.get("/", tags=["health"])
 def health_check():
