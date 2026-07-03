@@ -20,7 +20,7 @@ const Card = ({
     outline: 'border border-[#E5E7EB] bg-transparent',
   };
 
-  const hoverStyle = hoverEffect ? 'hover:scale-[1.01] hover:shadow-premium' : '';
+  const hoverStyle = hoverEffect ? 'hover:-translate-y-0.5 hover:shadow-premium transition-all duration-200' : '';
   const variantStyle = variants[variant] || variants.surface;
 
   return (
