@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
   const { login } = useAuth();
@@ -18,8 +18,8 @@ const Login = () => {
     try {
       const result = await login(email, password);
       if (result.success) {
-        // Since dashboard isn't active, redirect to home page
-        navigate('/');
+        // Redirect to dashboard page
+        navigate('/dashboard');
       } else {
         setError(result.error || 'Invalid credentials');
       }

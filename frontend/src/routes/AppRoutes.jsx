@@ -4,6 +4,7 @@ import ProtectedLayout from '../layouts/ProtectedLayout';
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
 
 const AppRoutes = () => {
@@ -16,14 +17,9 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
       </Route>
 
-      {/* Protected Routes (JWT-Ready Skeleton Structure) */}
+      {/* Protected Routes (JWT-Ready Structure) */}
       <Route element={<ProtectedLayout />}>
-        {/* 
-          Placeholder for future sprints:
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/checkins" element={<CheckIns />} />
-          <Route path="/calendar" element={<AcademicCalendar />} />
-        */}
+        <Route path="/dashboard" element={<Dashboard />} />
       </Route>
 
       {/* Fallback Catch-All Route */}

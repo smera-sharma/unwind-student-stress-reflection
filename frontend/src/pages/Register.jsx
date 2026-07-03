@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const Register = () => {
   const { register } = useAuth();
@@ -19,7 +19,7 @@ const Register = () => {
     try {
       const result = await register(email, password, fullName);
       if (result.success) {
-        navigate('/');
+        navigate('/dashboard');
       } else {
         setError(result.error || 'Registration failed');
       }

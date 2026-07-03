@@ -8,32 +8,53 @@ export default {
     extend: {
       colors: {
         unwind: {
-          blue: {
-            DEFAULT: '#a5c9eb', // Soft blue
-            dark: '#2c5d88',
-            light: '#d4e5f7',
+          bg: '#FAF9F6', // Warm off-white
+          surface: '#FFFFFF', // Clean white
+          primary: {
+            DEFAULT: '#6B8E7A', // Sage green
+            dark: '#587665',
+            light: '#E2EBE5',
           },
-          lavender: {
-            DEFAULT: '#d6c5f0', // Pastel lavender
-            dark: '#674d8c',
-            light: '#f2ecfc',
+          secondary: {
+            DEFAULT: '#89A8B2', // Dusty blue
+            dark: '#6E8B95',
+            light: '#E9EFF1',
           },
-          mint: {
-            DEFAULT: '#b8e2c8', // Mint
-            dark: '#2e6b4e',
-            light: '#e8f7ee',
+          warm: {
+            DEFAULT: '#E8DCC8', // Sand
+            dark: '#C8BBA5',
+            light: '#FAF7F2',
           },
-          bg: '#f7f9fc', // Off-white
-          glass: 'rgba(255, 255, 255, 0.65)',
-          text: '#1e293b', // Slate-800 for clean premium text contrast
+          text: {
+            primary: '#2F3A3F', // Dark charcoal/slate
+            secondary: '#6B7280', // Slate gray
+          },
+          border: '#E5E7EB', // Light gray
+          error: '#DC6B6B', // Soft red
+          success: '#6BAA75', // Soft green
         }
       },
       fontFamily: {
-        sans: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Poppins', 'sans-serif'],
       },
       boxShadow: {
-        'premium': '0 8px 32px 0 rgba(31, 38, 135, 0.04)',
-        'glass': '0 8px 32px 0 rgba(140, 188, 208, 0.08)',
+        'soft': '0 2px 12px 0 rgba(47, 58, 63, 0.03)',
+        'premium': '0 4px 24px 0 rgba(47, 58, 63, 0.04)',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-6px)' },
+        },
+        floatSlow: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-3px)' },
+        },
+      },
+      animation: {
+        float: 'float 5s ease-in-out infinite',
+        floatSlow: 'floatSlow 7s ease-in-out infinite',
       }
     },
   },
