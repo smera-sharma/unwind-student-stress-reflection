@@ -147,3 +147,98 @@ JSON Format:
         logger.error(f"Gemini API call failed: {e}. Falling back to heuristics.")
 
     return heuristic_fallback(data.journal, data.mood)
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage]
+    mood: str
+    memory: list[str]
+
+def chat_heuristic_fallback(messages: list[ChatMessage], mood: str):
+    last_message = messages[-1].content.lower() if messages else ""
+    
+    # Check if student is stressed/down
+    if mood in ['Stressed', 'Down', '😩', '😔']:
+        support_start = "I understand you're feeling really stressed or down today. Please remember to be gentle with yourself. "
+    else:
+        support_start = ""
+
+    if any(w in last_message for w in ['stress', 'anxious', 'tired', 'overwhelmed', 'sad']):
+        return support_start + "It's completely okay to feel overwhelmed by college life. Try to pause, take three deep breaths, and focus on just the next step. You've got this."
+    elif any(w in last_message for w in ['study', 'exam', 'class', 'test', 'assignment', 'grade']):
+        return "Exams and course deadlines demand a lot of energy. Make sure you schedule small study breaks and reward yourself for your progress."
+    elif any(w in last_message for w in ['happy', 'excited', 'glad', 'good']):
+        return "That's wonderful to hear! Celebrating these brighter moments is a great way to reinforce positive mental energy."
+    elif any(w in last_message for w in ['hello', 'hi', 'hey']):
+        return "Hello! 👋 I'm your Unwind wellness companion. I'm here to listen or chat about whatever is on your mind."
+    
+    return support_start + "Thank you for sharing that with me. I'm always here to listen and help you reflect whenever you need a safe space."
+
+@router.post("/chat")
+def chat_with_companion(data: ChatRequest):
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key or api_key == "mock_api_key_placeholder":
+        logger.warning("GEMINI_API_KEY environment variable is missing or placeholder. Running chat fallback.")
+        return {"response": chat_heuristic_fallback(data.messages, data.mood)}
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    
+    # Compile prompt
+    memory_str = "\n".join([f"- {m}" for m in data.memory]) if data.memory else "No recent reflection history."
+    
+    mood_instruction = "The student's mood today is neutral."
+    if data.mood in ['Stressed', 'Down', '😩', '😔']:
+        mood_instruction = "The student is feeling stressed, tired, or down today. Be extremely supportive, gentle, warm, and comforting. Do not be overly analytical or transactional."
+    elif data.mood in ['Amazing', 'Good', '😀', '🙂']:
+        mood_instruction = "The student is feeling happy, excited, or good today. Celebrate their positive energy and progress!"
+        
+    prompt = f"""You are Unwind's AI Conversational Wellness Companion. You are here to support a student, help them manage stress, reflect on their day, and find balance.
+
+RULES:
+- Provide supportive, conversational, empathetic, and non-clinical advice.
+- Never diagnose, prescribe, or claim to be a therapist.
+- Keep responses relatively brief (1-3 sentences or a short bulleted list) and highly personalized.
+- Use markdown format for lists, bold text, or sections if needed.
+
+CONTEXT:
+Student's recent reflection logs (memory):
+{memory_str}
+
+Current State:
+{mood_instruction}
+
+Conversation history:
+"""
+    for msg in data.messages:
+        role_label = "Student" if msg.role == "user" else "Companion"
+        prompt += f"\n{role_label}: {msg.content}"
+        
+    prompt += "\nCompanion:"
+
+    payload = {
+        "contents": [{
+            "parts": [{
+                "text": prompt
+            }]
+        }]
+    }
+
+    try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode('utf-8'),
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=10) as response:
+            res_data = response.read().decode('utf-8')
+            res_json = json.loads(res_data)
+            content = res_json['candidates'][0]['content']['parts'][0]['text'].strip()
+            return {"response": content}
+    except Exception as e:
+        logger.error(f"Gemini API call failed for chat: {e}. Falling back to heuristics.")
+        
+    return {"response": chat_heuristic_fallback(data.messages, data.mood)}

@@ -52,6 +52,9 @@ const Navbar = () => {
               <Link to="/calendar" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
                 Calendar
               </Link>
+              <Link to="/companion" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
+                AI Companion
+              </Link>
             </>
           )}
         </div>
@@ -186,6 +189,13 @@ const Navbar = () => {
                 className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
               >
                 Calendar
+              </Link>
+              <Link
+                to="/companion"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
+              >
+                AI Companion
               </Link>
               <Link
                 to="/profile"
