@@ -22,7 +22,12 @@ const Profile = () => {
     dailyReminder: false,
     reminderTime: '20:00',
     timezone: 'UTC',
-    notificationsEnabled: true
+    notificationsEnabled: true,
+    weeklyReminders: true,
+    motivationalMessages: true,
+    quietHoursEnabled: false,
+    quietHoursStart: '22:00',
+    quietHoursEnd: '08:00'
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -50,31 +55,46 @@ const Profile = () => {
           preferredPronouns: profRes.data.preferred_pronouns || ''
         });
 
+        const localNotifSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+
         setSettingsForm({
           theme: settRes.data.theme || 'system',
           dailyReminder: settRes.data.daily_reminder || false,
           reminderTime: settRes.data.reminder_time || '20:00',
           timezone: settRes.data.timezone || 'UTC',
-          notificationsEnabled: settRes.data.notifications_enabled !== false
+          notificationsEnabled: settRes.data.notifications_enabled !== false,
+          weeklyReminders: localNotifSettings.weeklyReminders !== false,
+          motivationalMessages: localNotifSettings.motivationalMessages !== false,
+          quietHoursEnabled: !!localNotifSettings.quietHoursEnabled,
+          quietHoursStart: localNotifSettings.quietHoursStart || '22:00',
+          quietHoursEnd: localNotifSettings.quietHoursEnd || '08:00'
         });
       } catch (err) {
-        console.warn("Failed loading profile from backend. Using local mock stubs.", err);
-        // Fallback offline stubs
+        console.warn("Failed loading profile from backend. Using local context fallback.", err);
+        const localNotifSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
         setProfileForm({
           fullName: user?.fullName || 'Jane Doe',
           displayName: user?.displayName || 'Eshniie',
           email: user?.email || 'user@unwind.com',
-          bio: 'Student looking for wellness balance.',
-          profilePicture: '🌱',
-          preferredPronouns: 'she/her'
+          bio: user?.bio || 'Student looking for wellness balance.',
+          profilePicture: user?.profilePicture || '🌱',
+          preferredPronouns: user?.preferredPronouns || 'she/her'
         });
+        setSettingsForm(prev => ({
+          ...prev,
+          weeklyReminders: localNotifSettings.weeklyReminders !== false,
+          motivationalMessages: localNotifSettings.motivationalMessages !== false,
+          quietHoursEnabled: !!localNotifSettings.quietHoursEnabled,
+          quietHoursStart: localNotifSettings.quietHoursStart || '22:00',
+          quietHoursEnd: localNotifSettings.quietHoursEnd || '08:00'
+        }));
       } finally {
         setIsLoading(false);
       }
     };
 
     loadProfileData();
-  }, [user]);
+  }, []);
 
   // 2. Immediate live theme preview
   const handleThemePreview = (newTheme) => {
@@ -97,18 +117,29 @@ const Profile = () => {
     e.preventDefault();
     setIsSavingProfile(true);
     try {
-      await api.put('/profile', {
+      const response = await api.put('/profile', {
         full_name: profileForm.fullName,
         display_name: profileForm.displayName,
         bio: profileForm.bio,
         profile_picture: profileForm.profilePicture,
         preferred_pronouns: profileForm.preferredPronouns
       });
+      
+      const data = response.data;
+      setProfileForm({
+        fullName: data.full_name || '',
+        displayName: data.display_name || '',
+        email: data.email || '',
+        bio: data.bio || '',
+        profilePicture: data.profile_picture || '🌱',
+        preferredPronouns: data.preferred_pronouns || ''
+      });
+
       await refreshUser();
-      showToast('✓ Profile Updated', 'Your profile details have been saved.');
+      showToast('✓ Profile Updated', 'Profile updated successfully.');
     } catch (err) {
-      console.warn("Backend profile save unavailable. Simulating save.");
-      showToast('✓ Saved (Local)', 'Profile saved to temporary session.');
+      console.error("Profile save failed:", err);
+      showToast('❌ Save Failed', 'Failed to update profile. Please try again.');
     } finally {
       setIsSavingProfile(false);
     }
@@ -118,19 +149,45 @@ const Profile = () => {
     e.preventDefault();
     setIsSavingSettings(true);
     try {
-      await api.put('/settings', {
+      const response = await api.put('/settings', {
         theme: settingsForm.theme,
         daily_reminder: settingsForm.dailyReminder,
         reminder_time: settingsForm.reminderTime,
         timezone: settingsForm.timezone,
         notifications_enabled: settingsForm.notificationsEnabled
       });
-      localStorage.setItem('theme', settingsForm.theme);
+
+      const data = response.data;
+      
+      const extSettings = {
+        weeklyReminders: settingsForm.weeklyReminders,
+        motivationalMessages: settingsForm.motivationalMessages,
+        quietHoursEnabled: settingsForm.quietHoursEnabled,
+        quietHoursStart: settingsForm.quietHoursStart,
+        quietHoursEnd: settingsForm.quietHoursEnd
+      };
+      localStorage.setItem('notificationSettings', JSON.stringify(extSettings));
+      localStorage.setItem('reminderTime', settingsForm.reminderTime);
+
+      setSettingsForm({
+        theme: data.theme || 'system',
+        dailyReminder: data.daily_reminder || false,
+        reminderTime: data.reminder_time || '20:00',
+        timezone: data.timezone || 'UTC',
+        notificationsEnabled: data.notifications_enabled !== false,
+        weeklyReminders: settingsForm.weeklyReminders,
+        motivationalMessages: settingsForm.motivationalMessages,
+        quietHoursEnabled: settingsForm.quietHoursEnabled,
+        quietHoursStart: settingsForm.quietHoursStart,
+        quietHoursEnd: settingsForm.quietHoursEnd
+      });
+
+      localStorage.setItem('theme', data.theme || 'system');
+      await refreshUser();
       showToast('✓ Settings Saved', 'Preferences updated successfully.');
     } catch (err) {
-      console.warn("Backend settings save unavailable. Simulating save.");
-      localStorage.setItem('theme', settingsForm.theme);
-      showToast('✓ Saved (Local)', 'Theme preferences persistent locally.');
+      console.error("Settings save failed:", err);
+      showToast('❌ Save Failed', 'Failed to update settings. Please try again.');
     } finally {
       setIsSavingSettings(false);
     }
@@ -384,16 +441,16 @@ const Profile = () => {
           {activeTab === 'notifications' && (
             <Card className="p-8 text-left space-y-6 dark:bg-slate-950 dark:border-slate-800" hoverEffect={false}>
               <div>
-                <h3 className="text-lg font-bold text-[#2F3A3F] dark:text-slate-100">Notifications & Timezone</h3>
-                <p className="text-xs text-[#6B7280] dark:text-slate-400 font-medium mt-0.5">Control daily reminder times and local coordinates.</p>
+                <h3 className="text-lg font-bold text-[#2F3A3F] dark:text-slate-100">Notifications & Quiet Hours</h3>
+                <p className="text-xs text-[#6B7280] dark:text-slate-400 font-medium mt-0.5">Control daily reminder times, quiet hours, and alerts.</p>
               </div>
 
               <form onSubmit={handleSaveSettings} className="space-y-5">
-                {/* Enable notifications checkbox */}
+                {/* Daily Reminders Checkbox */}
                 <div className="flex items-center justify-between p-4 bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-2xl shadow-soft select-none">
-                  <div className="space-y-0.5">
-                    <h4 className="text-xs font-bold text-[#2F3A3F] dark:text-slate-200">Enable Reminders</h4>
-                    <p className="text-[10px] text-[#6B7280] dark:text-slate-400 font-medium">Receive notification pings on study times.</p>
+                  <div className="space-y-0.5 text-left">
+                    <h4 className="text-xs font-bold text-[#2F3A3F] dark:text-slate-200">Daily Journal Reminders</h4>
+                    <p className="text-[10px] text-[#6B7280] dark:text-slate-400 font-medium">Receive alerts to complete your reflection log.</p>
                   </div>
                   <input
                     type="checkbox"
@@ -403,9 +460,9 @@ const Profile = () => {
                   />
                 </div>
 
-                {/* Reminder Time Picker */}
+                {/* Daily Reminder Time Picker */}
                 {settingsForm.dailyReminder && (
-                  <div className="space-y-1 animate-fade-in">
+                  <div className="space-y-1 animate-fade-in text-left">
                     <label htmlFor="time" className="text-[10px] font-bold text-[#89A8B2] uppercase block">Daily Reminder Time</label>
                     <input
                       id="time"
@@ -417,8 +474,76 @@ const Profile = () => {
                   </div>
                 )}
 
+                {/* Weekly Reminders Checkbox */}
+                <div className="flex items-center justify-between p-4 bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-2xl shadow-soft select-none">
+                  <div className="space-y-0.5 text-left">
+                    <h4 className="text-xs font-bold text-[#2F3A3F] dark:text-slate-200">Weekly Reflection Reminders</h4>
+                    <p className="text-[10px] text-[#6B7280] dark:text-slate-400 font-medium">Receive weekly logs summary notifications.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settingsForm.weeklyReminders}
+                    onChange={(e) => setSettingsForm(prev => ({ ...prev, weeklyReminders: e.target.checked }))}
+                    className="w-4.5 h-4.5 accent-[#6B8E7A] rounded cursor-pointer"
+                  />
+                </div>
+
+                {/* Motivational Messages Checkbox */}
+                <div className="flex items-center justify-between p-4 bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-2xl shadow-soft select-none">
+                  <div className="space-y-0.5 text-left">
+                    <h4 className="text-xs font-bold text-[#2F3A3F] dark:text-slate-200">Motivational Messages</h4>
+                    <p className="text-[10px] text-[#6B7280] dark:text-slate-400 font-medium">Receive proactive encouraging insights.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settingsForm.motivationalMessages}
+                    onChange={(e) => setSettingsForm(prev => ({ ...prev, motivationalMessages: e.target.checked }))}
+                    className="w-4.5 h-4.5 accent-[#6B8E7A] rounded cursor-pointer"
+                  />
+                </div>
+
+                {/* Quiet Hours Checkbox */}
+                <div className="flex items-center justify-between p-4 bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-2xl shadow-soft select-none">
+                  <div className="space-y-0.5 text-left">
+                    <h4 className="text-xs font-bold text-[#2F3A3F] dark:text-slate-200">Enable Quiet Hours</h4>
+                    <p className="text-[10px] text-[#6B7280] dark:text-slate-400 font-medium">Mute notifications during designated sleep/quiet windows.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={settingsForm.quietHoursEnabled}
+                    onChange={(e) => setSettingsForm(prev => ({ ...prev, quietHoursEnabled: e.target.checked }))}
+                    className="w-4.5 h-4.5 accent-[#6B8E7A] rounded cursor-pointer"
+                  />
+                </div>
+
+                {/* Quiet Hours Range Picker */}
+                {settingsForm.quietHoursEnabled && (
+                  <div className="grid grid-cols-2 gap-4 animate-fade-in text-left">
+                    <div className="space-y-1">
+                      <label htmlFor="quiet-start" className="text-[10px] font-bold text-[#89A8B2] uppercase block">Quiet Hours Start</label>
+                      <input
+                        id="quiet-start"
+                        type="time"
+                        className="w-full bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-[#2F3A3F] dark:text-slate-200 focus:outline-none focus:border-[#6B8E7A] transition-all font-semibold"
+                        value={settingsForm.quietHoursStart}
+                        onChange={(e) => setSettingsForm(prev => ({ ...prev, quietHoursStart: e.target.value }))}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label htmlFor="quiet-end" className="text-[10px] font-bold text-[#89A8B2] uppercase block">Quiet Hours End</label>
+                      <input
+                        id="quiet-end"
+                        type="time"
+                        className="w-full bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-[#2F3A3F] dark:text-slate-200 focus:outline-none focus:border-[#6B8E7A] transition-all font-semibold"
+                        value={settingsForm.quietHoursEnd}
+                        onChange={(e) => setSettingsForm(prev => ({ ...prev, quietHoursEnd: e.target.value }))}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 {/* Timezone */}
-                <div className="space-y-1">
+                <div className="space-y-1 text-left">
                   <label htmlFor="timezone" className="text-[10px] font-bold text-[#89A8B2] uppercase block">Timezone</label>
                   <select
                     id="timezone"

@@ -49,6 +49,9 @@ const Navbar = () => {
               <Link to="/insights" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
                 Insights
               </Link>
+              <Link to="/calendar" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
+                Calendar
+              </Link>
             </>
           )}
         </div>
@@ -62,7 +65,11 @@ const Navbar = () => {
                 className="inline-flex items-center gap-1.5 text-xs bg-white border border-[#E5E7EB] text-[#2F3A3F] px-3.5 py-1.5 rounded-2xl font-bold transition-colors hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer shadow-soft"
                 type="button"
               >
-                <User size={12} className="text-[#6B8E7A]" />
+                {user?.profilePicture ? (
+                  <span className="text-sm select-none mr-0.5">{user.profilePicture}</span>
+                ) : (
+                  <User size={12} className="text-[#6B8E7A]" />
+                )}
                 {user?.displayName || user?.fullName || user?.email}
               </button>
               
@@ -81,6 +88,13 @@ const Navbar = () => {
                     className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                   >
                     📊 Insights
+                  </Link>
+                  <Link 
+                    to="/calendar" 
+                    onClick={() => setDropdownOpen(false)}
+                    className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
+                  >
+                    📅 Calendar
                   </Link>
                   <Link 
                     to="/profile" 
@@ -165,6 +179,13 @@ const Navbar = () => {
                 className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
               >
                 Insights
+              </Link>
+              <Link
+                to="/calendar"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
+              >
+                Calendar
               </Link>
               <Link
                 to="/profile"

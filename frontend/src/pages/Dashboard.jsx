@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { X } from 'lucide-react';
+import { startNotificationScheduler } from '../services/notificationService';
 
 // Import all modular subcomponents
 import WelcomeBanner from '../components/dashboard/WelcomeBanner';
+import WellnessCompanion from '../components/dashboard/WellnessCompanion';
 import MoodSelector from '../components/dashboard/MoodSelector';
 import JournalCard from '../components/dashboard/JournalCard';
 import AIReflectionCard from '../components/dashboard/AIReflectionCard';
@@ -131,6 +133,11 @@ const Dashboard = () => {
     prevJournalVal.current = journal;
   }, [journal, selectedMood]);
 
+  useEffect(() => {
+    const cleanup = startNotificationScheduler();
+    return () => cleanup();
+  }, []);
+
   // Dynamic Streak display calculation
   const displayStreak = journal.trim().length >= 50 ? streak + 1 : streak;
 
@@ -156,12 +163,15 @@ const Dashboard = () => {
       {/* Top Section - Merged Welcome Banner, Thought, and Daily Tip */}
       <div className="space-y-6">
         <WelcomeBanner user={user} streak={displayStreak} />
-        <MoodSelector selectedMood={selectedMood} onMoodChange={handleMoodChange} />
+        <WellnessCompanion history={history} streak={displayStreak} selectedMood={selectedMood} journal={journal} />
+        <div id="mood-selector-container">
+          <MoodSelector selectedMood={selectedMood} onMoodChange={handleMoodChange} />
+        </div>
       </div>
 
       {/* Row 1: 12-column layout grid (Journal vs Reflection & Insights) */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 items-stretch">
-        <div className="lg:col-span-7">
+        <div className="lg:col-span-7" id="journal-input-container">
           <JournalCard journal={journal} setJournal={setJournal} journalRef={journalRef} />
         </div>
         <div className="lg:col-span-5 flex flex-col gap-8">

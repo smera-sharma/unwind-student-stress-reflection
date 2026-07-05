@@ -139,11 +139,11 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
 
   return (
     <div ref={aiReflectionRef} className="h-full animate-fade-in">
-      <Card className="p-8 flex flex-col h-full text-left justify-between" hoverEffect={false}>
+      <Card className="p-8 flex flex-col h-full text-left justify-between dark:bg-slate-950 dark:border-slate-800" hoverEffect={false}>
         {/* Header Title */}
         <div>
           <span className="text-xs font-semibold text-[#89A8B2] tracking-wide uppercase block">Reflection</span>
-          <h3 className="text-xl font-semibold text-[#2F3A3F] mt-1 tracking-tight flex items-center gap-1.5 select-none">
+          <h3 className="text-xl font-semibold text-[#2F3A3F] dark:text-slate-100 mt-1 tracking-tight flex items-center gap-1.5 select-none">
             ✨ Gentle Reflection
           </h3>
         </div>
@@ -168,13 +168,27 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
               <div className="h-10 bg-slate-200 rounded w-full" />
             </div>
           </div>
+        ) : journal.trim().length === 0 ? (
+          /* Empty State Section */
+          <div className="flex-grow flex flex-col items-center justify-center text-center py-6 gap-3.5 select-none">
+            <div className="text-xs text-[#6B7280] dark:text-slate-400 font-semibold border border-dashed border-[#E5E7EB] dark:border-slate-800 rounded-2xl bg-[#FAF9F6]/50 dark:bg-slate-900/30 p-6 w-full">
+              No insights available yet. Write some thoughts in your journal to generate reflection metrics.
+            </div>
+            <button
+              onClick={() => document.getElementById('journal-input-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="text-xs bg-[#6B8E7A] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#587665] transition-colors focus:outline-none shadow-soft"
+              type="button"
+            >
+              ✍️ Start Writing
+            </button>
+          </div>
         ) : reflectionData ? (
           /* Loaded Reflection Content */
           <div className="flex-grow space-y-4 py-3">
             {/* Section 1: Summary */}
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Today's Summary</span>
-              <p className="text-xs sm:text-sm text-[#2F3A3F] font-semibold leading-relaxed">
+              <p className="text-xs sm:text-sm text-[#2F3A3F] dark:text-slate-200 font-semibold leading-relaxed">
                 {reflectionData.summary}
               </p>
             </div>
@@ -184,10 +198,10 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
               <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Detected Themes</span>
               <div className="flex flex-wrap gap-1.5">
                 {reflectionData.themes?.length === 0 ? (
-                  <span className="text-xs text-[#6B7280] font-medium italic">No clear themes detected yet.</span>
+                  <span className="text-xs text-[#6B7280] dark:text-slate-400 font-medium italic">No clear themes detected yet.</span>
                 ) : (
                   reflectionData.themes?.map((theme, idx) => (
-                    <span key={idx} className="text-[10px] font-bold bg-[#FAF7F2] border border-[#E8DCC8]/50 text-[#2F3A3F] px-2 py-0.5 rounded-full select-none shadow-soft animate-fade-in">
+                    <span key={idx} className="text-[10px] font-bold bg-[#FAF7F2] dark:bg-slate-900 border border-[#E8DCC8]/50 dark:border-slate-800 text-[#2F3A3F] dark:text-slate-200 px-2 py-0.5 rounded-full select-none shadow-soft animate-fade-in">
                       {theme}
                     </span>
                   ))
@@ -197,9 +211,9 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
 
             {/* Section 3: Insight / Reflection */}
             {reflectionData.reflection && (
-              <div className="space-y-1.5 p-3.5 bg-[#FAF7F2] border border-[#E8DCC8]/40 rounded-2xl">
+              <div className="space-y-1.5 p-3.5 bg-[#FAF7F2] dark:bg-slate-900 border border-[#E8DCC8]/40 dark:border-slate-800 rounded-2xl">
                 <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Gentle Insight</span>
-                <p className="text-xs text-[#6B7280] font-medium leading-relaxed">
+                <p className="text-xs text-[#6B7280] dark:text-slate-400 font-medium leading-relaxed">
                   {reflectionData.reflection}
                 </p>
               </div>
@@ -210,7 +224,7 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
               <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Today's Suggestions</span>
               <div className="grid grid-cols-1 gap-2.5">
                 {reflectionData.suggestions?.map((sug, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-white border border-[#E5E7EB] text-xs font-semibold text-[#2F3A3F] shadow-soft">
+                  <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 text-xs font-semibold text-[#2F3A3F] dark:text-slate-300 shadow-soft">
                     {sug}
                   </div>
                 ))}

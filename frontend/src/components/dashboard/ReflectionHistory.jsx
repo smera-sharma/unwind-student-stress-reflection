@@ -30,20 +30,24 @@ const ReflectionHistory = ({ history = [] }) => {
     return emojis[mood] || '📝';
   };
 
+  const handleScrollToJournal = () => {
+    document.getElementById('journal-input-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <Card className="p-8 flex flex-col text-left space-y-6 h-full" hoverEffect={false}>
+    <Card className="p-8 flex flex-col text-left space-y-6 h-full dark:bg-slate-950 dark:border-slate-800" hoverEffect={false}>
       {/* Header section with inline Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-semibold text-[#89A8B2] tracking-wide uppercase block">Journal Logs</span>
-          <h3 className="text-xl font-semibold text-[#2F3A3F] mt-1 tracking-tight">Reflection History</h3>
+          <h3 className="text-xl font-semibold text-[#2F3A3F] dark:text-slate-100 mt-1 tracking-tight">Reflection History</h3>
         </div>
 
         {/* Search Field */}
         <div className="relative max-w-xs w-full">
           <input
             type="text"
-            className="w-full bg-[#FAF9F6] border border-[#E5E7EB] rounded-2xl pl-10 pr-4 py-2.5 text-xs text-[#2F3A3F] focus:outline-none focus:border-[#6B8E7A]/60 transition-all font-medium"
+            className="w-full bg-[#FAF9F6] border border-[#E5E7EB] rounded-2xl pl-10 pr-4 py-2.5 text-xs text-[#2F3A3F] focus:outline-none focus:border-[#6B8E7A]/60 transition-all font-medium dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200"
             placeholder="Search date, mood, text..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -54,8 +58,19 @@ const ReflectionHistory = ({ history = [] }) => {
 
       {/* History Items list limited to 3 */}
       <div className="space-y-4 flex-grow overflow-y-auto max-h-[360px] pr-2">
-        {displayHistory.length === 0 ? (
-          <div className="text-center py-12 text-[#6B7280] text-xs font-semibold border border-dashed border-[#E5E7EB] rounded-2xl bg-[#FAF9F6]/50">
+        {history.length === 0 ? (
+          <div className="text-center py-12 text-[#6B7280] dark:text-slate-400 text-xs font-semibold border border-dashed border-[#E5E7EB] dark:border-slate-800 rounded-2xl bg-[#FAF9F6]/50 dark:bg-slate-900/30 flex flex-col items-center gap-3">
+            <span>No reflections yet.</span>
+            <button
+              onClick={handleScrollToJournal}
+              className="text-xs bg-[#6B8E7A] text-white px-4 py-2 rounded-xl font-bold hover:bg-[#587665] transition-colors focus:outline-none shadow-soft"
+              type="button"
+            >
+              ✍️ Write First Reflection
+            </button>
+          </div>
+        ) : displayHistory.length === 0 ? (
+          <div className="text-center py-12 text-[#6B7280] dark:text-slate-400 text-xs font-semibold border border-dashed border-[#E5E7EB] dark:border-slate-800 rounded-2xl bg-[#FAF9F6]/50 dark:bg-slate-900/30">
             No reflections found. Try adjusting your search query.
           </div>
         ) : (

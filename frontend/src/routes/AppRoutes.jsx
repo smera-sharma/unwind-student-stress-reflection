@@ -7,6 +7,7 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
 import Insights from '../pages/Insights';
+import Calendar from '../pages/Calendar';
 import NotFound from '../pages/NotFound';
 
 const AppRoutes = () => {
@@ -24,6 +25,7 @@ const AppRoutes = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/insights" element={<Insights />} />
+        <Route path="/calendar" element={<Calendar />} />
       </Route>
 
       {/* Fallback Catch-All Route */}
