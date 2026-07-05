@@ -8,7 +8,8 @@ import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
 import Insights from '../pages/Insights';
 import Calendar from '../pages/Calendar';
-import Companion from '../pages/Companion';
+import Luna from '../pages/Luna';
+import Resources from '../pages/Resources';
 import NotFound from '../pages/NotFound';
 
 const AppRoutes = () => {
@@ -27,7 +28,8 @@ const AppRoutes = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/insights" element={<Insights />} />
         <Route path="/calendar" element={<Calendar />} />
-        <Route path="/companion" element={<Companion />} />
+        <Route path="/luna" element={<Luna />} />
+        <Route path="/resources" element={<Resources />} />
       </Route>
 
       {/* Fallback Catch-All Route */}

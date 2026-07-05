@@ -5,7 +5,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { MessageSquare, Send, Trash2, Edit3, Plus, Search, Download, Sparkles, Check, X } from 'lucide-react';
 
-const Companion = () => {
+const Luna = () => {
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [activeConvId, setActiveConvId] = useState(null);
@@ -185,7 +185,7 @@ const Companion = () => {
       const companionMessage = {
         id: `msg_${Date.now() + 1}`,
         role: 'model',
-        content: "I'm having trouble connecting to the backend right now, but I'm here for you offline. Take a deep breath and give it another try in a moment.",
+        content: "I'm having trouble connecting to Luna online right now, but I'm here to support you offline. Let's try breaking things down one step at a time.",
         timestamp: new Date().toISOString()
       };
       updatedConv = {
@@ -206,17 +206,17 @@ const Companion = () => {
     const dateStr = new Date(activeConv.createdAt).toLocaleDateString();
 
     if (format === 'markdown') {
-      content = `# Conversation: ${activeConv.title}\n*Date: ${dateStr}*\n\n---\n\n`;
+      content = `# Conversation with Luna: ${activeConv.title}\n*Date: ${dateStr}*\n\n---\n\n`;
       activeConv.messages.forEach(msg => {
         const timeStr = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const sender = msg.role === 'user' ? 'Student' : 'Companion';
+        const sender = msg.role === 'user' ? 'Student' : 'Luna';
         content += `**${sender}** (${timeStr}):\n${msg.content}\n\n`;
       });
     } else {
-      content = `Conversation: ${activeConv.title}\nDate: ${dateStr}\n${'='.repeat(40)}\n\n`;
+      content = `Conversation with Luna: ${activeConv.title}\nDate: ${dateStr}\n${'='.repeat(40)}\n\n`;
       activeConv.messages.forEach(msg => {
         const timeStr = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        const sender = msg.role === 'user' ? 'Student' : 'Companion';
+        const sender = msg.role === 'user' ? 'Student' : 'Luna';
         content += `[${timeStr}] ${sender}: ${msg.content}\n\n`;
       });
     }
@@ -225,7 +225,7 @@ const Companion = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${activeConv.title.toLowerCase().replace(/\s+/g, '_')}.${format === 'markdown' ? 'md' : 'txt'}`;
+    link.download = `luna_${activeConv.title.toLowerCase().replace(/\s+/g, '_')}.${format === 'markdown' ? 'md' : 'txt'}`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -265,25 +265,26 @@ const Companion = () => {
     html = html.replace(/(<li.*?>.*?<\/li>)/g, '<ul class="my-1.5">$1</ul>');
     html = html.replace(/<\/ul>\s*<ul class="my-1.5">/g, '');
 
-    return <div className="space-y-1 text-xs sm:text-sm leading-relaxed" dangerouslySetInnerHTML={{ __html: html }} />;
+    return <div className="space-y-1 text-xs sm:text-sm leading-relaxed text-[#2F3A3F] dark:text-slate-350" dangerouslySetInnerHTML={{ __html: html }} />;
   };
 
   // Suggested replies config
   const suggestedReplies = [
-    "I'm feeling stressed",
-    "Tell me something encouraging",
-    "Help me study",
-    "I can't sleep",
-    "How can I relax?"
+    "📄 Summarize Today's Journal",
+    "📅 Plan My Week",
+    "🎯 Break Down My Goal",
+    "📚 Help Me Study",
+    "📝 Organize My Thoughts",
+    "💡 Brainstorm Ideas"
   ];
 
   return (
-    <div className="flex-grow max-w-7xl mx-auto px-6 sm:px-8 py-8 w-full select-none animate-fade-in">
+    <div className="flex-grow max-w-7xl mx-auto px-6 sm:px-8 py-8 w-full select-none animate-fade-in text-left">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-stretch h-[calc(100vh-11rem)] min-h-[500px]">
         
         {/* Left column: Chats Sidebar */}
         <div className="md:col-span-4 lg:col-span-3 flex flex-col gap-4 h-full">
-          <Button onClick={handleStartNewConversation} className="w-full flex items-center justify-center gap-2 !py-3">
+          <Button onClick={handleStartNewConversation} className="w-full flex items-center justify-center gap-2 !py-3 font-bold text-xs uppercase">
             <Plus size={16} /> New Chat
           </Button>
 
@@ -385,10 +386,13 @@ const Companion = () => {
                 <div className="p-4 bg-[#E2EBE5] dark:bg-emerald-950/40 rounded-full text-[#587665] dark:text-emerald-400">
                   <Sparkles size={28} />
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-[#2F3A3F] dark:text-slate-100">Hi 👋</h3>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-extrabold text-[#2F3A3F] dark:text-slate-100">🌙 Hi, I'm Luna.</h3>
                   <p className="text-xs text-[#6B7280] dark:text-slate-400 font-semibold max-w-sm">
-                    I'm your AI Wellness Companion. I'm here whenever you'd like to talk.
+                    I'm here to help you organize your thoughts, understand your reflections, and solve problems one step at a time.
+                  </p>
+                  <p className="text-xs text-[#6B7280] dark:text-slate-400 font-bold max-w-sm">
+                    What would you like to work on today?
                   </p>
                 </div>
                 <Button onClick={handleStartNewConversation} className="!px-6">
@@ -397,7 +401,7 @@ const Companion = () => {
               </div>
             ) : (
               /* Active Chat Container */
-              <div className="flex-col flex-grow flex overflow-hidden">
+              <div className="flex flex-col flex-grow overflow-hidden">
                 {/* Chat Area Header: Title and Download Export Options */}
                 <div className="border-b border-[#E5E7EB] dark:border-slate-800 pb-3 flex items-center justify-between">
                   <div className="text-left">
@@ -439,7 +443,7 @@ const Companion = () => {
                       return (
                         <div
                           key={msg.id}
-                          className={`flex flex-col max-w-[70%] select-none ${
+                          className={`flex flex-col max-w-[75%] select-none ${
                             isUser ? 'ml-auto text-right items-end' : 'mr-auto text-left items-start'
                           }`}
                         >
@@ -464,7 +468,7 @@ const Companion = () => {
                   {isLoading && (
                     <div className="mr-auto text-left items-start max-w-[70%] space-y-1 animate-pulse select-none">
                       <div className="p-3.5 rounded-2xl bg-[#FAF9F6] dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-850 w-28 h-8 rounded-tl-none" />
-                      <span className="text-[9px] text-slate-400 font-bold block">Companion is writing...</span>
+                      <span className="text-[9px] text-slate-400 font-bold block">Luna is writing...</span>
                     </div>
                   )}
 
@@ -472,12 +476,12 @@ const Companion = () => {
                 </div>
 
                 {/* Suggested Reply Chips Footer */}
-                {activeConv?.messages.length > 0 && activeConv.messages[activeConv.messages.length - 1].role === 'model' && !isLoading && (
+                {!isLoading && (
                   <div className="flex flex-wrap gap-2 py-2.5 border-t border-[#E5E7EB] dark:border-slate-800 select-none justify-start">
                     {suggestedReplies.map((reply, index) => (
                       <button
                         key={index}
-                        onClick={() => handleSendMessage(reply)}
+                        onClick={() => setInputMessage(reply)}
                         className="text-[10px] font-bold bg-[#FAF9F6] border border-[#E5E7EB] dark:bg-slate-900 dark:border-slate-850 dark:text-slate-350 text-[#6B7280] px-3 py-1.5 rounded-full hover:bg-[#E2EBE5]/50 dark:hover:bg-slate-800 transition-colors focus:outline-none shadow-soft"
                         type="button"
                       >
@@ -511,6 +515,11 @@ const Companion = () => {
                     <Send size={14} />
                   </Button>
                 </form>
+
+                {/* Safety notice disclaimer footer */}
+                <span className="text-[10px] text-[#6B7280] dark:text-slate-500 mt-3 text-center block max-w-lg mx-auto leading-normal select-none font-semibold">
+                  Luna is an AI reflection and productivity companion designed to help organize thoughts, encourage self-reflection, and support everyday planning. It does not replace qualified medical, psychological, or emergency support.
+                </span>
               </div>
             )}
           </Card>
@@ -521,4 +530,4 @@ const Companion = () => {
   );
 };
 
-export default Companion;
+export default Luna;

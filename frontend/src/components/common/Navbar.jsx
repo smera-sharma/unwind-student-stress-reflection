@@ -52,8 +52,11 @@ const Navbar = () => {
               <Link to="/calendar" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
                 Calendar
               </Link>
-              <Link to="/companion" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
-                AI Companion
+              <Link to="/resources" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
+                Resources
+              </Link>
+              <Link to="/luna" className="text-sm font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] dark:hover:text-emerald-400 transition-colors">
+                Luna
               </Link>
             </>
           )}
@@ -191,11 +194,18 @@ const Navbar = () => {
                 Calendar
               </Link>
               <Link
-                to="/companion"
+                to="/resources"
                 onClick={() => setIsOpen(false)}
                 className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
               >
-                AI Companion
+                Resources
+              </Link>
+              <Link
+                to="/luna"
+                onClick={() => setIsOpen(false)}
+                className="text-base font-semibold text-[#6B7280] dark:text-slate-400 hover:text-[#6B8E7A] transition-colors"
+              >
+                Luna
               </Link>
               <Link
                 to="/profile"

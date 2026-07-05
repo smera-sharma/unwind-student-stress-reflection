@@ -100,7 +100,7 @@ const WellnessCompanion = ({ history, streak, selectedMood, journal }) => {
       <Card className="p-6 dark:bg-slate-950 dark:border-slate-800" hoverEffect={false}>
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="space-y-1.5 flex-grow">
-            <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Wellness Companion</span>
+            <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Luna Companion</span>
             <p className="text-sm font-semibold text-[#2F3A3F] dark:text-slate-200 italic">
               "{companionMsg}"
             </p>

@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import Card from '../components/ui/Card';
 import { X } from 'lucide-react';
 import { startNotificationScheduler } from '../services/notificationService';
+
 
 // Import all modular subcomponents
 import WelcomeBanner from '../components/dashboard/WelcomeBanner';
@@ -15,10 +18,19 @@ import QuickActions from '../components/dashboard/QuickActions';
 import ReflectionHistory from '../components/dashboard/ReflectionHistory';
 import WellnessScoreCard from '../components/dashboard/WellnessScoreCard';
 import AchievementsCard from '../components/dashboard/AchievementsCard';
-import BreathingExercise from '../components/dashboard/BreathingExercise';
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const [showLunaIntro, setShowLunaIntro] = useState(() => {
+    return !localStorage.getItem('luna_intro_dismissed');
+  });
+
+  const handleDismissLunaIntro = () => {
+    localStorage.setItem('luna_intro_dismissed', 'true');
+    setShowLunaIntro(false);
+  };
   
   // 1. Centralized States persistent in LocalStorage
   const [selectedMood, setSelectedMood] = useState(() => {
@@ -57,7 +69,6 @@ const Dashboard = () => {
     return mockHistory;
   });
 
-  const [activeModal, setActiveModal] = useState(false);
   const [toast, setToast] = useState(null);
 
   // Scroll targets refs (Idiomatic React layout targets)
@@ -147,9 +158,9 @@ const Dashboard = () => {
     } else if (action === 'AI Reflection') {
       aiReflectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else if (action === 'Breathing Exercise') {
-      setActiveModal(true);
+      navigate('/resources#breathing');
     } else if (action === 'Resources') {
-      showToast('ℹ️ Resources', 'Coming in Sprint 4');
+      navigate('/resources');
     }
   };
 
@@ -163,6 +174,53 @@ const Dashboard = () => {
       {/* Top Section - Merged Welcome Banner, Thought, and Daily Tip */}
       <div className="space-y-6">
         <WelcomeBanner user={user} streak={displayStreak} />
+        
+        {showLunaIntro && (
+          <Card className="p-6 border-[#6B8E7A]/20 bg-[#FAF7F2] dark:bg-slate-900 dark:border-slate-800 text-left space-y-4 relative" hoverEffect={false}>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-base font-extrabold text-[#2F3A3F] dark:text-slate-100 flex items-center gap-1.5 select-none">
+                  🌙 Meet Luna
+                </h3>
+                <p className="text-xs text-[#89A8B2] font-semibold mt-0.5">Your Reflection & Productivity Companion</p>
+              </div>
+              <button 
+                onClick={handleDismissLunaIntro} 
+                className="p-1 hover:bg-slate-200/50 text-[#6B7280] dark:text-slate-400 rounded-full transition-colors focus:outline-none" 
+                aria-label="Dismiss Introduction"
+                type="button"
+              >
+                <X size={14} />
+              </button>
+            </div>
+            
+            <p className="text-xs text-[#6B7280] dark:text-slate-400 leading-relaxed font-semibold">
+              Luna helps you organize your thoughts, summarize reflections, identify patterns, break overwhelming problems into manageable steps, and support your daily productivity.
+              <span className="block mt-2 font-bold text-slate-500 dark:text-slate-350">
+                Luna is not a therapist and does not provide medical, psychological, or crisis advice.
+              </span>
+            </p>
+
+            <div className="flex flex-wrap gap-2 pt-1 select-none">
+              {["✨ Summarize", "📊 Spot Patterns", "🎯 Break Down Goals", "📅 Plan Your Week"].map(chip => (
+                <span key={chip} className="text-[10px] font-bold bg-white dark:bg-slate-950 border border-[#E5E7EB] dark:border-slate-800 text-[#2F3A3F] dark:text-slate-300 px-3 py-1.5 rounded-full shadow-soft">
+                  {chip}
+                </span>
+              ))}
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button 
+                onClick={handleDismissLunaIntro} 
+                className="px-5 py-2 text-[10px] font-extrabold text-white bg-[#6B8E7A] hover:bg-[#587665] rounded-xl transition-all uppercase tracking-wider focus:outline-none shadow-soft"
+                type="button"
+              >
+                Got it
+              </button>
+            </div>
+          </Card>
+        )}
+
         <WellnessCompanion history={history} streak={displayStreak} selectedMood={selectedMood} journal={journal} />
         <div id="mood-selector-container">
           <MoodSelector selectedMood={selectedMood} onMoodChange={handleMoodChange} />
@@ -209,24 +267,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Breathing Exercise Modal Overlay */}
-      {activeModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#FAF9F6]/60 backdrop-blur-md transition-all duration-300">
-          <div className="bg-white border border-[#E5E7EB] rounded-3xl p-8 max-w-md w-full mx-4 shadow-premium relative text-center space-y-6">
-            <button
-              onClick={() => setActiveModal(false)}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-slate-50 text-[#6B7280] transition-colors focus:outline-none"
-              aria-label="Close Modal"
-              type="button"
-            >
-              <X size={18} />
-            </button>
-            
-            {/* Breathing Timer component */}
-            <BreathingExercise />
-          </div>
-        </div>
-      )}
+
 
       {/* Floating Toast Notification Box */}
       {toast && (
