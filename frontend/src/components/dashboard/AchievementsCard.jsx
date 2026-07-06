@@ -22,10 +22,10 @@ const AchievementsCard = ({ history = [], streak = 4, checkInCount = 4 }) => {
         {milestones.map((mil, idx) => (
           <div
             key={idx}
-            className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 select-none ${
+            className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 select-none ${
               mil.unlocked
-                ? 'bg-white border-[#6B8E7A]/25 shadow-soft opacity-100'
-                : 'bg-slate-50/50 border-[#E5E7EB] opacity-50 filter grayscale'
+                ? 'bg-white dark:bg-[#243244] border-[#6B8E7A]/25 dark:border-white/10 shadow-soft opacity-100'
+                : 'bg-slate-50/50 dark:bg-slate-800/30 border-[#E5E7EB] dark:border-white/5 opacity-50 filter grayscale'
             }`}
           >
             <div className="text-xl shrink-0">{mil.icon}</div>

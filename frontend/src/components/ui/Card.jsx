@@ -7,17 +7,17 @@ const Card = ({
   variant = 'surface',
   ...props
 }) => {
-  const baseStyle = 'rounded-2xl transition-all duration-300';
+  const baseStyle = 'rounded-xl transition-all duration-300';
   
   const variants = {
     // Journal page look
-    surface: 'bg-white dark:bg-slate-950 border border-[#E5E7EB] dark:border-slate-800/80 shadow-soft',
+    surface: 'bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-white/10 shadow-soft dark:shadow-xl dark:shadow-slate-950/20 backdrop-blur-sm',
     
     // Light shaded borderless panel
-    shaded: 'bg-[#FAF7F2] dark:bg-slate-900 border border-[#E5E7EB]/50 dark:border-slate-850 shadow-soft',
+    shaded: 'bg-[#FAF7F2] dark:bg-[#243244] border border-[#E5E7EB]/50 dark:border-white/10 shadow-soft dark:shadow-xl dark:shadow-slate-950/20 backdrop-blur-sm',
     
     // Outline style
-    outline: 'border border-[#E5E7EB] dark:border-slate-800 bg-transparent',
+    outline: 'border border-[#E5E7EB] dark:border-white/10 bg-transparent',
   };
 
   const hoverStyle = hoverEffect ? 'hover:-translate-y-0.5 hover:shadow-premium transition-all duration-200' : '';

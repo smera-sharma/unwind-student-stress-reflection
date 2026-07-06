@@ -160,22 +160,35 @@ class ChatRequest(BaseModel):
 def chat_heuristic_fallback(messages: list[ChatMessage], mood: str):
     last_message = messages[-1].content.lower() if messages else ""
     
-    # Check if student is stressed/down
-    if mood in ['Stressed', 'Down', '😩', '😔']:
-        support_start = "I understand you're feeling really stressed or down today. Please remember to be gentle with yourself. "
-    else:
-        support_start = ""
-
-    if any(w in last_message for w in ['stress', 'anxious', 'tired', 'overwhelmed', 'sad']):
-        return support_start + "It's completely okay to feel overwhelmed by college life. Try to pause, take three deep breaths, and focus on just the next step. You've got this."
-    elif any(w in last_message for w in ['study', 'exam', 'class', 'test', 'assignment', 'grade']):
-        return "Exams and course deadlines demand a lot of energy. Make sure you schedule small study breaks and reward yourself for your progress."
-    elif any(w in last_message for w in ['happy', 'excited', 'glad', 'good']):
-        return "That's wonderful to hear! Celebrating these brighter moments is a great way to reinforce positive mental energy."
-    elif any(w in last_message for w in ['hello', 'hi', 'hey']):
-        return "Hello! 👋 I'm your Unwind wellness companion. I'm here to listen or chat about whatever is on your mind."
+    # Classify the intent based on keywords
+    is_planning = any(w in last_message for w in ['plan', 'schedule', 'week', 'calendar', 'organize', 'routine'])
+    is_studying = any(w in last_message for w in ['study', 'exam', 'test', 'revision', 'midterm', 'finals', 'homework', 'lecture'])
+    is_productivity = any(w in last_message for w in ['procrastinating', 'procrastinate', 'lazy', 'focus', 'distracted', 'slacking', 'stuck'])
+    is_decision = any(w in last_message for w in ['choose', 'decide', 'option', 'choice', 'alternative', 'split', 'decision'])
+    is_reflection = any(w in last_message for w in ['reflect', 'thinking about', 'pondering', 'mind', 'day', 'entry', 'journal'])
+    is_goals = any(w in last_message for w in ['goal', 'target', 'achievement', 'habit', 'aim'])
+    is_brainstorm = any(w in last_message for w in ['brainstorm', 'ideas', 'creative', 'thoughts', 'list', 'suggestions'])
+    is_emotional = any(w in last_message for w in ['stressed', 'stress', 'anxious', 'anxiety', 'sad', 'lonely', 'family', 'problem', 'cry', 'worry', 'bad', 'rough'])
     
-    return support_start + "Thank you for sharing that with me. I'm always here to listen and help you reflect whenever you need a safe space."
+    if is_planning:
+        return "Let's organize it together. What are the three most important things you'd like to accomplish this week? Once we have those, we can build a realistic schedule."
+    elif is_studying:
+        return "Let's tackle your study preparation. Would it help to:\n- Build a study timetable\n- Create a revision planner\n- Organize a priority matrix\n- Set up a Pomodoro plan\n- Arrange a break schedule?"
+    elif is_productivity:
+        return "Instead of searching for motivation, let's break your task into tiny, manageable steps. What is the very first, 5-minute action you can take right now?"
+    elif is_decision:
+        return "Making choices can feel heavy. Let's list the pros and cons, use a priority scoring matrix, or compare the long-term vs short-term impact of your options. What decision are you facing today?"
+    elif is_reflection:
+        return "That sounds like a meaningful point to pause. Looking back on this today, what's one thing you felt in control of, and what's one thing you'd like to let go of?"
+    elif is_goals:
+        return "Let's define a clear path forward. What is one specific, measurable goal you want to focus on, and how will you track your progress?"
+    elif is_brainstorm:
+        return "Let's brainstorm. I will list some ideas in structured formats to help you explore different options. What concept or problem are we exploring?"
+    elif is_emotional:
+        return "I can see this has been weighing on you. Would it help to:\n- Organize your thoughts\n- Prepare for a conversation\n- Make a plan\n- Focus on what you can control today?"
+    
+    # Fallback to general welcome or open prompt
+    return "Hi, I'm Luna. Your wellness and productivity companion. I can help you plan your week, study, reflect, brainstorm, or make decisions. What would you like to work on today?"
 
 @router.post("/chat")
 def chat_with_companion(data: ChatRequest):
@@ -195,23 +208,27 @@ def chat_with_companion(data: ChatRequest):
     elif data.mood in ['Amazing', 'Good', '😀', '🙂']:
         mood_instruction = "The student is feeling happy, excited, or good today. Celebrate their positive progress and structure their goals!"
         
-    prompt = f"""You are Luna, Unwind's AI Reflection & Productivity Companion. You function as a reflective thinking partner, study companion, organization assistant, productivity helper, and journal summarizer.
+    prompt = f"""You are Luna, the AI companion inside Unwind.
+Your purpose is to help users organize thoughts, solve problems, reflect, plan, brainstorm, and make decisions.
+You are warm, calm, intelligent, and encouraging.
+You never claim to be a therapist, counselor, psychologist, or mental health professional.
+You never diagnose.
+You never provide medical advice.
 
-CRITICAL HEALTH & SAFETY LIMITS:
-- You are NOT a therapist, psychologist, or medical professional.
-- Never diagnose symptoms, offer psychiatric counsel, or pretend to replace professional medical care.
-- Never claim to feel human emotions or understand them directly like a human.
-- Do NOT use phrases like: "I understand exactly how you feel", "I'm always here for you", or "I know this must be difficult".
+Before generating your response, classify the user's message into one of these intents:
+- Planning
+- Productivity
+- Studying
+- Decision Making
+- Reflection
+- Goal Setting
+- Brainstorming
+- Intent-Aware Emotional Check-In
+- General Conversation
 
-RESPONSE STYLE DIRECTIVES:
-- Focus responses on organizing busy thoughts, identifying common themes, simplifying overwhelming situations, breaking tasks down into structured milestones, and offering study suggestions.
-- Keep responses relatively brief (1-3 sentences or a short bullet list).
-- Use markdown for lists and bolding where helpful.
-- Prefer phrasing like:
-  "Based on what you've written..."
-  "I noticed a recurring theme..."
-  "Here's one possible way to organize this..."
-  "It might help to tackle this in smaller steps."
+Generate your response based on the detected intent instead of generic fallback text.
+When conversations involve emotional topics, acknowledge them briefly (validate without overdoing it) before guiding the user toward practical next steps. Prefer structured responses, actionable suggestions, and thoughtful questions over generic reassurance.
+Completely avoid repetitive generic responses such as "I'm here to listen", "I'm always here for you", "Thank you for sharing", or "I'm glad you told me". Help users feel capable rather than dependent.
 
 CONTEXT:
 Student's recent reflection logs (memory):

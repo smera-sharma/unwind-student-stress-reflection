@@ -43,12 +43,12 @@ const Home = () => {
 
         {/* Right Side - Human-Centered Composition */}
         <div className="lg:col-span-5 flex justify-center">
-          <div className="relative w-full max-w-[380px] aspect-square rounded-[36px] bg-[#FAF7F2] border border-[#E5E7EB]/60 flex items-center justify-center overflow-hidden shadow-soft">
+          <div className="relative w-full max-w-[380px] aspect-square rounded-[36px] bg-[#FAF7F2] dark:bg-[#243244] border border-[#E5E7EB]/60 dark:border-white/10 flex items-center justify-center overflow-hidden shadow-soft">
             
             {/* Concentric Calming Breathing Circles */}
             <div className="absolute w-64 h-64 rounded-full border border-[#6B8E7A]/10 flex items-center justify-center">
               <div className="w-48 h-48 rounded-full border border-[#6B8E7A]/8 flex items-center justify-center">
-                <div className="w-32 h-32 rounded-full bg-[#E8DCC8]/25 flex items-center justify-center text-[#6B8E7A]">
+                <div className="w-32 h-32 rounded-full bg-[#E8DCC8]/25 dark:bg-[#E8DCC8]/10 flex items-center justify-center text-[#6B8E7A] dark:text-[#A7C4A0]">
                   <Wind size={40} className="opacity-90" />
                 </div>
               </div>
@@ -56,7 +56,7 @@ const Home = () => {
 
             {/* Organic SVG Leaf Illustration */}
             <svg 
-              className="absolute top-10 left-12 w-8 h-8 text-[#6B8E7A]/40" 
+              className="absolute top-10 left-12 w-8 h-8 text-[#6B8E7A]/40 dark:text-[#A7C4A0]/40" 
               viewBox="0 0 24 24" 
               fill="none" 
               stroke="currentColor" 
@@ -66,26 +66,26 @@ const Home = () => {
             </svg>
             
             {/* Floating Mood Emojis & Journal Chips */}
-            <div className="absolute top-8 left-6 bg-white px-3 py-1.5 rounded-full border border-[#E5E7EB] text-xs text-[#2F3A3F] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-float">
+            <div className="absolute top-8 left-6 bg-white dark:bg-[#1E293B] px-3 py-1.5 rounded-full border border-[#E5E7EB] dark:border-white/10 text-xs text-[#2F3A3F] dark:text-[#F8FAFC] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-float">
               <span>🙂</span> Good Day
             </div>
 
-            <div className="absolute bottom-6 left-8 bg-white px-3 py-1.5 rounded-full border border-[#E5E7EB] text-xs text-[#2F3A3F] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-floatSlow">
+            <div className="absolute bottom-6 left-8 bg-white dark:bg-[#1E293B] px-3 py-1.5 rounded-full border border-[#E5E7EB] dark:border-white/10 text-xs text-[#2F3A3F] dark:text-[#F8FAFC] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-floatSlow">
               <span>😔</span> Rough Lecture
             </div>
 
-            <div className="absolute top-16 right-6 bg-white px-3 py-1.5 rounded-full border border-[#E5E7EB] text-xs text-[#2F3A3F] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-floatSlow">
+            <div className="absolute top-16 right-6 bg-white dark:bg-[#1E293B] px-3 py-1.5 rounded-full border border-[#E5E7EB] dark:border-white/10 text-xs text-[#2F3A3F] dark:text-[#F8FAFC] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-floatSlow">
               <span>😌</span> Feeling Better
             </div>
 
-            <div className="absolute bottom-16 right-8 bg-[#E2EBE5] px-3 py-1.5 rounded-full border border-[#6B8E7A]/30 text-xs text-[#587665] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-float">
+            <div className="absolute bottom-16 right-8 bg-[#E2EBE5] dark:bg-[#A7C4A0]/10 px-3 py-1.5 rounded-full border border-[#6B8E7A]/30 dark:border-[#A7C4A0]/30 text-xs text-[#587665] dark:text-[#A7C4A0] font-semibold shadow-soft inline-flex items-center gap-1.5 animate-float">
               <span>📖</span> Journal Saved
             </div>
 
             {/* Tiny Handwritten note styling panel */}
-            <div className="absolute top-1/2 left-6 bg-white border border-[#E5E7EB] rounded-2xl p-3 shadow-soft text-left max-w-[130px] animate-floatSlow">
-              <span className="text-[10px] text-[#6B7280] font-medium tracking-wide block uppercase">Note</span>
-              <p className="text-[11px] font-medium text-[#2F3A3F] mt-0.5 leading-normal">
+            <div className="absolute top-1/2 left-6 bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-white/10 rounded-xl p-3 shadow-soft text-left max-w-[130px] animate-floatSlow">
+              <span className="text-[10px] text-[#6B7280] dark:text-slate-400 font-medium tracking-wide block uppercase">Note</span>
+              <p className="text-[11px] font-medium text-[#2F3A3F] dark:text-[#CBD5E1] mt-0.5 leading-normal">
                 Take a deep breath before the study group.
               </p>
             </div>
@@ -184,7 +184,7 @@ const Home = () => {
         <div className="max-w-xl mx-auto relative pl-8 border-l-2 border-dashed border-[#E5E7EB]">
           {/* Step 1 */}
           <div className="relative mb-16">
-            <div className="absolute -left-[41px] top-0.5 w-6 h-6 rounded-full bg-[#6B8E7A] border-4 border-white flex items-center justify-center shadow-soft" />
+            <div className="absolute -left-[41px] top-0.5 w-6 h-6 rounded-full bg-[#6B8E7A] border-4 border-white dark:border-[#0F172A] flex items-center justify-center shadow-soft" />
             <div className="space-y-2 text-left">
               <h3 className="text-lg font-bold text-[#2F3A3F]">Reflect</h3>
               <p className="text-sm text-[#6B7280] leading-relaxed">
@@ -195,7 +195,7 @@ const Home = () => {
 
           {/* Step 2 */}
           <div className="relative mb-16">
-            <div className="absolute -left-[41px] top-0.5 w-6 h-6 rounded-full bg-[#89A8B2] border-4 border-white flex items-center justify-center shadow-soft" />
+            <div className="absolute -left-[41px] top-0.5 w-6 h-6 rounded-full bg-[#89A8B2] border-4 border-white dark:border-[#0F172A] flex items-center justify-center shadow-soft" />
             <div className="space-y-2 text-left">
               <h3 className="text-lg font-bold text-[#2F3A3F]">Understand</h3>
               <p className="text-sm text-[#6B7280] leading-relaxed">
@@ -206,7 +206,7 @@ const Home = () => {
 
           {/* Step 3 */}
           <div className="relative">
-            <div className="absolute -left-[41px] top-0.5 w-6 h-6 rounded-full bg-[#C8BBA5] border-4 border-white flex items-center justify-center shadow-soft" />
+            <div className="absolute -left-[41px] top-0.5 w-6 h-6 rounded-full bg-[#C8BBA5] border-4 border-white dark:border-[#0F172A] flex items-center justify-center shadow-soft" />
             <div className="space-y-2 text-left">
               <h3 className="text-lg font-bold text-[#2F3A3F]">Grow</h3>
               <p className="text-sm text-[#6B7280] leading-relaxed">
@@ -256,17 +256,17 @@ const Home = () => {
       </section>
 
       {/* 5. Call-To-Action Banner */}
-      <section className="relative w-full rounded-3xl bg-[#6B8E7A] p-12 md:p-20 text-center text-white overflow-hidden shadow-soft">
+      <section className="relative w-full rounded-3xl bg-[#6B8E7A] dark:bg-[#1E293B] dark:border dark:border-white/10 p-12 md:p-20 text-center text-white overflow-hidden shadow-soft">
         <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-          <h2 className="text-3xl font-bold font-sans">
+          <h2 className="text-3xl font-bold font-sans dark:text-[#F8FAFC]">
             Ready to find your academic balance?
           </h2>
-          <p className="text-white/90 text-sm leading-relaxed">
+          <p className="text-white/90 dark:text-[#CBD5E1] text-sm leading-relaxed">
             Create your account today and unlock tools tailored to help you handle semester stress. It takes less than a minute.
           </p>
           <div className="pt-4">
             <Link to="/register">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold border-white/20 bg-white hover:bg-slate-50 text-[#2F3A3F]">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto font-bold border-white/20 dark:border-transparent bg-white dark:bg-[#FAF9F6] hover:bg-slate-50 dark:hover:bg-slate-200 text-[#2F3A3F] dark:text-[#0F172A]">
                 Start Your Journey
               </Button>
             </Link>

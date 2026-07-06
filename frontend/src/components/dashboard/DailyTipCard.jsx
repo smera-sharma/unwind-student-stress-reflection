@@ -60,12 +60,12 @@ const DailyTipCard = () => {
   const tip = tips[seed];
 
   return (
-    <Card className="p-6 text-left border-[#E5E7EB] shadow-soft animate-fade-in transition-opacity duration-500" hoverEffect={false}>
+    <Card className="p-6 text-left border-[#E5E7EB] dark:border-slate-700 bg-white dark:bg-slate-800 shadow-soft animate-fade-in transition-opacity duration-500" hoverEffect={false}>
       <div className="flex items-start gap-3">
-        <div className="text-xl select-none pt-0.5">💡</div>
+        <div className="text-xl select-none pt-0.5 text-[#6B8E7A] dark:text-[#A7C4A0]">💡</div>
         <div className="space-y-1">
-          <span className="text-xs font-semibold text-[#89A8B2] tracking-wider uppercase block">Daily Wellness Tip</span>
-          <p className="text-sm font-medium text-[#2F3A3F] leading-relaxed">
+          <span className="text-xs font-semibold text-[#89A8B2] dark:text-slate-300 tracking-wider uppercase block">Daily Wellness Tip</span>
+          <p className="text-sm font-medium text-[#2F3A3F] dark:text-slate-100 leading-relaxed">
             {tip}
           </p>
         </div>

@@ -5,15 +5,30 @@
 /* Poppins (Headings) & Inter (Body) Font Imports */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap');
 
+:root {
+  --chart-grid: #E5E7EB;
+  --chart-axis: #6B7280;
+  --chart-line: #6B8E7A;
+  --chart-tooltip-bg: #FFFFFF;
+  --chart-tooltip-border: #E5E7EB;
+}
+.dark {
+  --chart-grid: rgba(255, 255, 255, 0.05);
+  --chart-axis: #CBD5E1;
+  --chart-line: #A7C4A0;
+  --chart-tooltip-bg: #1E293B;
+  --chart-tooltip-border: rgba(255, 255, 255, 0.08);
+}
+
 @layer base {
   body {
-    @apply bg-unwind-bg text-unwind-text-primary font-sans antialiased dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300;
+    @apply bg-unwind-bg text-unwind-text-primary font-sans antialiased dark:bg-[#0F172A] dark:text-[#CBD5E1] transition-colors duration-300;
     margin: 0;
     line-height: 1.7; /* Generous line spacing for readability */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight text-[#2F3A3F] dark:text-slate-100;
+    @apply font-heading tracking-tight text-[#2F3A3F] dark:text-[#F8FAFC];
   }
 }
 
@@ -40,32 +55,87 @@
   animation: breathe 8s ease-in-out infinite;
 }
 
-/* Global Dark Mode Hex Overrides */
+/* Global Dark Mode Overrides */
 .dark .text-\[\#2F3A3F\] {
-  color: #f1f5f9 !important; /* text-slate-100 */
+  color: #F8FAFC !important; /* Primary Text */
 }
 .dark .text-\[\#6B7280\] {
-  color: #94a3b8 !important; /* text-slate-400 */
+  color: #CBD5E1 !important; /* Secondary Text */
+}
+.dark .text-slate-400, .dark .text-gray-400, .dark .text-slate-500 {
+  color: #94A3B8 !important; /* Muted Text */
 }
 .dark .bg-white {
-  background-color: #020617 !important; /* bg-slate-950 */
+  background-color: #1E293B !important; /* Card background */
 }
 .dark .bg-\[\#FAF9F6\] {
-  background-color: #090d16 !important; /* dark slate bg */
+  background-color: #0F172A !important; /* Background */
 }
 .dark .bg-\[\#FAF7F2\] {
-  background-color: #0f172a !important; /* bg-slate-900 */
+  background-color: #243244 !important; /* Shaded background */
 }
 .dark .border-\[\#E5E7EB\] {
-  border-color: #1e293b !important; /* border-slate-800 */
+  border-color: rgba(255, 255, 255, 0.08) !important; /* Border */
+}
+.dark .border-\[\#E5E7EB\/50\] {
+  border-color: rgba(255, 255, 255, 0.04) !important; /* Subtle Border */
+}
+.dark .dark\:bg-slate-900 {
+  background-color: #1E293B !important;
+}
+.dark .dark\:bg-slate-950 {
+  background-color: #0F172A !important;
+}
+.dark .dark\:border-slate-800,
+.dark .dark\:border-slate-850 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .bg-white\/70 {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+}
+.dark .bg-white\/60 {
+  background-color: rgba(30, 41, 59, 0.6) !important;
+}
+.dark .bg-slate-50\/50 {
+  background-color: rgba(36, 50, 68, 0.5) !important;
+}
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-gray-50:hover,
+.dark .hover\:bg-gray-100:hover {
+  background-color: #243244 !important;
+}
+.dark .bg-gray-50,
+.dark .bg-gray-100,
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: #243244 !important;
+}
+.dark .bg-slate-200,
+.dark .bg-neutral-100,
+.dark .bg-\[\#FAF7F2\] {
+  background-color: #1E293B !important;
+}
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-slate-700 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark .hover\:bg-slate-750:hover,
+.dark .hover\:bg-slate-700:hover,
+.dark .hover\:bg-slate-800\/80:hover {
+  background-color: #243244 !important;
 }
 .dark input, .dark textarea, .dark select {
-  background-color: #090d16 !important;
-  color: #f1f5f9 !important;
-  border-color: #1e293b !important;
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+.dark input::placeholder, .dark textarea::placeholder {
+  color: #94A3B8 !important;
 }
 .dark hr {
-  border-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 /* Accessibility outline rings */

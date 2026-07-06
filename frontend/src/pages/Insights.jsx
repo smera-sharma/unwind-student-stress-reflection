@@ -339,23 +339,24 @@ const Insights = () => {
                 ) : (
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={trendData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" className="dark:stroke-slate-800/50" />
-                      <XAxis dataKey="date" tick={{ fontSize: 9 }} stroke="#6B7280" />
-                      <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 9 }} stroke="#6B7280" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" />
+                      <XAxis dataKey="date" tick={{ fontSize: 9, fill: 'var(--chart-axis)' }} stroke="var(--chart-axis)" />
+                      <YAxis domain={[1, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 9, fill: 'var(--chart-axis)' }} stroke="var(--chart-axis)" />
                       <Tooltip 
                         contentStyle={{ 
                           fontSize: '11px', 
                           borderRadius: '12px', 
-                          border: '1px solid #E5E7EB',
-                          boxShadow: '0 2px 12px 0 rgba(47, 58, 63, 0.03)'
+                          backgroundColor: 'var(--chart-tooltip-bg)',
+                          borderColor: 'var(--chart-tooltip-border)',
+                          color: 'var(--chart-axis)'
                         }} 
                       />
                       <Line 
                         type="monotone" 
                         dataKey="Score" 
-                        stroke="#6B8E7A" 
+                        stroke="var(--chart-line)" 
                         strokeWidth={3} 
-                        dot={{ r: 3, fill: '#6B8E7A' }} 
+                        dot={{ r: 3, fill: 'var(--chart-line)' }} 
                         activeDot={{ r: 5 }} 
                         animationDuration={1500}
                       />

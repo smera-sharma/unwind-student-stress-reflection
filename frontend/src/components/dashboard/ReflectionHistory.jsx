@@ -80,13 +80,13 @@ const ReflectionHistory = ({ history = [] }) => {
             const truncatedText = item.text.length > 80 ? `${item.text.slice(0, 80)}...` : item.text;
 
             return (
-              <div key={idx} className="p-4 rounded-2xl bg-white border border-[#E5E7EB] shadow-soft space-y-3 transition-all duration-300">
+              <div key={idx} className="p-4 rounded-xl bg-white dark:bg-[#243244] border border-[#E5E7EB] dark:border-white/10 shadow-soft space-y-3 transition-all duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="text-lg select-none">{displayEmoji}</span>
-                    <span className="text-xs font-semibold text-[#2F3A3F]">{item.date}</span>
+                    <span className="text-xs font-semibold text-[#2F3A3F] dark:text-slate-100">{item.date}</span>
                   </div>
-                  <span className="text-[10px] font-bold bg-[#E2EBE5] text-[#587665] px-2.5 py-0.5 rounded-full select-none">
+                  <span className="text-[10px] font-bold bg-[#E2EBE5] dark:bg-[#A7C4A0]/10 text-[#587665] dark:text-[#A7C4A0] px-2.5 py-0.5 rounded-full select-none">
                     {item.mood || 'Reflected'}
                   </span>
                 </div>

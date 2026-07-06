@@ -112,7 +112,7 @@ const WelcomeBanner = ({ user, streak = 1 }) => {
             👋 {greetingText}, {user?.fullName || user?.email || 'Student'} {greetingSuffix}
           </h1>
 
-          <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm bg-white border border-[#E5E7EB] text-[#2F3A3F] px-3.5 py-1.5 rounded-full shadow-soft select-none font-semibold w-fit">
+          <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm bg-white dark:bg-[#1E293B] border border-[#E5E7EB] dark:border-white/10 text-[#2F3A3F] dark:text-[#F8FAFC] px-3.5 py-1.5 rounded-full shadow-soft select-none font-semibold w-fit">
             🔥 {streak > 1 ? `${streak} day reflection streak` : `Day ${streak || 1}`}
           </div>
         </div>
@@ -123,11 +123,11 @@ const WelcomeBanner = ({ user, streak = 1 }) => {
         </p>
 
         {/* Merged Daily Tip box styled as secondary info */}
-        <div className="p-3 bg-white/60 border border-[#E5E7EB]/50 rounded-xl text-left flex items-start gap-2.5">
+        <div className="p-3 bg-white/60 dark:bg-[#1E293B]/60 border border-[#E5E7EB]/50 dark:border-white/5 rounded-xl text-left flex items-start gap-2.5">
           <span className="text-base select-none mt-0.5">💡</span>
           <div className="space-y-0.5">
             <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Tip of the day</span>
-            <p className="text-xs text-[#2F3A3F] font-semibold leading-relaxed">
+            <p className="text-xs text-[#2F3A3F] dark:text-[#CBD5E1] font-semibold leading-relaxed">
               {tip}
             </p>
           </div>

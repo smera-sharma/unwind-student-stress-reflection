@@ -123,19 +123,19 @@ const JournalCard = ({ journal, setJournal, journalRef }) => {
 
           {/* Collapsible starter prompts inside accordion (collapsed by default) */}
           {localText.length === 0 && (
-            <div className="border border-[#E5E7EB] rounded-2xl bg-[#FAF9F6]/60 overflow-hidden transition-all duration-300">
+            <div className="border border-[#E5E7EB] dark:border-slate-700 rounded-2xl bg-[#FAF9F6]/60 dark:bg-slate-800 overflow-hidden transition-all duration-300">
               <button
                 type="button"
                 onClick={() => setShowStarter(!showStarter)}
-                className="w-full flex items-center justify-between px-4 py-3 text-xs font-semibold text-[#2F3A3F] hover:bg-[#FAF7F2] transition-colors focus:outline-none"
+                className="w-full flex items-center justify-between px-4 py-3 text-xs font-semibold text-[#2F3A3F] dark:text-slate-100 hover:bg-[#FAF7F2] dark:hover:bg-slate-700 bg-[#FAF9F6]/60 dark:bg-slate-800 transition-colors focus:outline-none"
               >
                 <span className="flex items-center gap-1.5">❓ Need help getting started?</span>
-                <span className="text-[#6B7280]">
+                <span className="text-[#6B7280] dark:text-slate-400">
                   {showStarter ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 </span>
               </button>
               {showStarter && (
-                <ul className="px-4 pb-4 pt-1 text-xs text-[#6B7280] space-y-2 list-disc list-inside leading-relaxed border-t border-[#E5E7EB]/50 font-medium">
+                <ul className="px-4 pb-4 pt-1 text-xs text-[#6B7280] dark:text-slate-300 space-y-2 list-disc list-inside leading-relaxed border-t border-[#E5E7EB]/50 dark:border-slate-700 font-medium bg-[#FAF9F6]/60 dark:bg-slate-800">
                   {starterPrompts.map((p, idx) => (
                     <li key={idx}>{p}</li>
                   ))}

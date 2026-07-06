@@ -211,7 +211,7 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
 
             {/* Section 3: Insight / Reflection */}
             {reflectionData.reflection && (
-              <div className="space-y-1.5 p-3.5 bg-[#FAF7F2] dark:bg-slate-900 border border-[#E8DCC8]/40 dark:border-slate-800 rounded-2xl">
+              <div className="space-y-1.5 p-3.5 bg-[#FAF7F2] dark:bg-[#243244] border border-[#E8DCC8]/40 dark:border-white/10 rounded-xl">
                 <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Gentle Insight</span>
                 <p className="text-xs text-[#6B7280] dark:text-slate-400 font-medium leading-relaxed">
                   {reflectionData.reflection}
@@ -224,7 +224,7 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
               <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Today's Suggestions</span>
               <div className="grid grid-cols-1 gap-2.5">
                 {reflectionData.suggestions?.map((sug, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 text-xs font-semibold text-[#2F3A3F] dark:text-slate-300 shadow-soft">
+                  <div key={idx} className="flex items-center gap-2 p-2.5 rounded-xl bg-white dark:bg-[#243244] border border-[#E5E7EB] dark:border-white/10 text-xs font-semibold text-[#2F3A3F] dark:text-slate-300 shadow-soft">
                     {sug}
                   </div>
                 ))}
