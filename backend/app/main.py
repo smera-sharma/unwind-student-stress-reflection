@@ -5,22 +5,18 @@ from app.core.database import engine
 from app.models.base import Base
 from app.api.v1.router import api_router
 
-# Reset SQLite database if schema mismatch (column display_name missing)
-import os
-import sqlite3
-if os.path.exists("./unwind.db"):
-    try:
-        conn = sqlite3.connect("./unwind.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT display_name FROM users LIMIT 1")
-        conn.close()
-    except sqlite3.OperationalError:
-        try:
-            conn.close()
-            os.remove("./unwind.db")
-            print("Successfully initialized new user columns in database.")
-        except Exception:
-            pass
+# Reset SQLite database if schema mismatch (missing display_name column) safely using SQLAlchemy reflection
+from sqlalchemy import inspect
+try:
+    inspector = inspect(engine)
+    if inspector.has_table("users"):
+        columns = [col["name"] for col in inspector.get_columns("users")]
+        if "display_name" not in columns:
+            print("Database schema mismatch detected (missing display_name column). Resetting database...")
+            Base.metadata.drop_all(bind=engine)
+            print("Database dropped successfully.")
+except Exception as e:
+    print(f"Database schema check failed/skipped: {e}")
 
 # Create SQLite database tables on startup (if not already existing)
 Base.metadata.create_all(bind=engine)

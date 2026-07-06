@@ -29,20 +29,18 @@ def get_current_user(
     # Query matching user in database
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        # Fallback to first user in database
-        user = db.query(User).first()
-        if not user:
-            # Seed a default demo user if the DB is completely empty
-            user = User(
-                email="user@unwind.com",
-                hashed_password="mock_hashed_password",
-                full_name="Jane Doe",
-                display_name="Eshniie",
-                is_active=True,
-                theme="system"
-            )
-            db.add(user)
-            db.commit()
-            db.refresh(user)
+        # Create a new user for this email on the fly to support offline/mock credentials isolation
+        display_name = email.split('@')[0].capitalize()
+        user = User(
+            email=email,
+            hashed_password="mock_hashed_password",
+            full_name=display_name,
+            display_name=display_name,
+            is_active=True,
+            theme="system"
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
     return user
