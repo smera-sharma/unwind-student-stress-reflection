@@ -72,13 +72,17 @@ const Profile = () => {
       } catch (err) {
         console.warn("Failed loading profile from backend. Using local context fallback.", err);
         const localNotifSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+        const email = user?.email || 'user@unwind.com';
+        const emailPrefix = email.split('@')[0];
+        const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+        
         setProfileForm({
-          fullName: user?.fullName || 'Jane Doe',
-          displayName: user?.displayName || 'Eshniie',
-          email: user?.email || 'user@unwind.com',
-          bio: user?.bio || 'Student looking for wellness balance.',
+          fullName: user?.fullName || defaultName,
+          displayName: user?.displayName || defaultName,
+          email: email,
+          bio: user?.bio || '',
           profilePicture: user?.profilePicture || '🌱',
-          preferredPronouns: user?.preferredPronouns || 'she/her'
+          preferredPronouns: user?.preferredPronouns || ''
         });
         setSettingsForm(prev => ({
           ...prev,
@@ -139,7 +143,14 @@ const Profile = () => {
       showToast('✓ Profile Updated', 'Profile updated successfully.');
     } catch (err) {
       console.error("Profile save failed:", err);
-      showToast('❌ Save Failed', 'Failed to update profile. Please try again.');
+      const isNetError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK');
+      const statusText = err.response 
+        ? `${err.response.status} ${err.response.statusText || ''}`.trim() 
+        : (isNetError ? 'Service Unavailable' : 'Error');
+      const detailMsg = err.response?.data?.detail 
+        || (isNetError ? 'Backend server is offline. Please verify it is running on port 8001.' : err.message)
+        || 'Failed to update profile.';
+      showToast(`❌ Save Failed (${statusText})`, detailMsg);
     } finally {
       setIsSavingProfile(false);
     }
@@ -187,7 +198,14 @@ const Profile = () => {
       showToast('✓ Settings Saved', 'Preferences updated successfully.');
     } catch (err) {
       console.error("Settings save failed:", err);
-      showToast('❌ Save Failed', 'Failed to update settings. Please try again.');
+      const isNetError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK');
+      const statusText = err.response 
+        ? `${err.response.status} ${err.response.statusText || ''}`.trim() 
+        : (isNetError ? 'Service Unavailable' : 'Error');
+      const detailMsg = err.response?.data?.detail 
+        || (isNetError ? 'Backend server is offline. Please verify it is running on port 8001.' : err.message)
+        || 'Failed to update settings.';
+      showToast(`❌ Save Failed (${statusText})`, detailMsg);
     } finally {
       setIsSavingSettings(false);
     }

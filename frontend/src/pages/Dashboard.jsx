@@ -222,13 +222,17 @@ const Dashboard = () => {
         )}
 
         <WellnessCompanion history={history} streak={displayStreak} selectedMood={selectedMood} journal={journal} />
+        
+        {/* Horizontal Quick Actions bar */}
+        <QuickActions onActionClick={handleActionClick} />
+
         <div id="mood-selector-container">
           <MoodSelector selectedMood={selectedMood} onMoodChange={handleMoodChange} />
         </div>
       </div>
 
       {/* Row 1: 12-column layout grid (Journal vs Reflection & Insights) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         <div className="lg:col-span-7" id="journal-input-container">
           <JournalCard journal={journal} setJournal={setJournal} journalRef={journalRef} />
         </div>
@@ -242,32 +246,21 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Row 2: 12-column layout grid (Analytics vs Actions) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 items-stretch">
+      {/* Row 2: 12-column layout grid (Analytics vs History Logs) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         <div className="lg:col-span-7">
           <WeeklyMoodChart weeklyMood={weeklyMood} streak={displayStreak} />
         </div>
         <div className="lg:col-span-5">
-          <QuickActions onActionClick={handleActionClick} />
-        </div>
-      </div>
-
-      {/* Row 3: 12-column layout grid (History vs Score & Achievements) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 items-stretch">
-        <div className="lg:col-span-7">
           <ReflectionHistory history={history} />
         </div>
-        <div className="lg:col-span-5 flex flex-col gap-8">
-          <div className="flex-1">
-            <WellnessScoreCard selectedMood={selectedMood} journal={journal} streak={displayStreak} weeklyMood={weeklyMood} />
-          </div>
-          <div className="flex-1">
-            <AchievementsCard history={history} streak={displayStreak} checkInCount={checkInCount} />
-          </div>
-        </div>
       </div>
 
-
+      {/* Row 3: 12-column layout grid (Score & Achievements Side-by-Side) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+        <WellnessScoreCard selectedMood={selectedMood} journal={journal} streak={displayStreak} weeklyMood={weeklyMood} />
+        <AchievementsCard history={history} streak={displayStreak} checkInCount={checkInCount} />
+      </div>
 
       {/* Floating Toast Notification Box */}
       {toast && (

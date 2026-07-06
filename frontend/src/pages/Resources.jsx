@@ -626,10 +626,14 @@ const Resources = () => {
                 <span className="text-xs font-bold text-[#89A8B2] tracking-wider uppercase block">Grounding Techniques</span>
                 
                 {/* Tabs */}
-                <div className="flex gap-2">
+                <div className="flex gap-2" role="tablist" aria-label="Grounding Exercises">
                   <button 
                     onClick={() => { setGroundingTab('54321'); setGroundingActiveStep(0); }}
-                    className={`text-[9px] font-bold px-2.5 py-1.5 rounded-lg border transition-all ${
+                    role="tab"
+                    id="54321-tab"
+                    aria-selected={groundingTab === '54321'}
+                    aria-controls="grounding-panel"
+                    className={`text-[9px] font-bold px-2.5 py-1.5 rounded-lg border transition-all focus:outline-none ${
                       groundingTab === '54321' ? 'bg-[#E2EBE5] border-[#6B8E7A] text-[#587665] dark:bg-emerald-950/40 dark:text-emerald-350' : 'bg-white border-[#E5E7EB] text-[#6B7280] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
                     }`}
                     type="button"
@@ -638,7 +642,11 @@ const Resources = () => {
                   </button>
                   <button 
                     onClick={() => { setGroundingTab('pmr'); setGroundingActiveStep(0); }}
-                    className={`text-[9px] font-bold px-2.5 py-1.5 rounded-lg border transition-all ${
+                    role="tab"
+                    id="pmr-tab"
+                    aria-selected={groundingTab === 'pmr'}
+                    aria-controls="pmr-panel"
+                    className={`text-[9px] font-bold px-2.5 py-1.5 rounded-lg border transition-all focus:outline-none ${
                       groundingTab === 'pmr' ? 'bg-[#E2EBE5] border-[#6B8E7A] text-[#587665] dark:bg-emerald-950/40 dark:text-emerald-350' : 'bg-white border-[#E5E7EB] text-[#6B7280] dark:bg-slate-900 dark:border-slate-800 dark:text-slate-400'
                     }`}
                     type="button"
@@ -650,7 +658,7 @@ const Resources = () => {
 
               {/* Tab Content */}
               {groundingTab === '54321' ? (
-                <div className="space-y-4 flex-grow flex flex-col justify-between py-2">
+                <div id="grounding-panel" role="tabpanel" aria-labelledby="54321-tab" className="space-y-4 flex-grow flex flex-col justify-between py-2">
                   <div className="space-y-2">
                     <h5 className="text-sm font-extrabold text-[#587665] dark:text-emerald-400">{groundingInstructions[groundingActiveStep]?.label}</h5>
                     <p className="text-xs text-[#6B7280] dark:text-slate-400 font-semibold leading-relaxed">
@@ -679,7 +687,7 @@ const Resources = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-4 flex-grow flex flex-col justify-between py-2">
+                <div id="pmr-panel" role="tabpanel" aria-labelledby="pmr-tab" className="space-y-4 flex-grow flex flex-col justify-between py-2">
                   <div className="space-y-2">
                     <h5 className="text-sm font-extrabold text-[#587665] dark:text-emerald-400">PMR Group: {pmrSteps[groundingActiveStep]?.part}</h5>
                     <p className="text-xs text-[#6B7280] dark:text-slate-400 font-semibold leading-relaxed">

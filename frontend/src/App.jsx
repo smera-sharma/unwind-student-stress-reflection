@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import AppRoutes from './routes/AppRoutes';
+import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
 
 function App() {
   useEffect(() => {
@@ -35,11 +36,13 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </Router>
+    <GlobalErrorBoundary>
+      <Router>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </Router>
+    </GlobalErrorBoundary>
   );
 }
 

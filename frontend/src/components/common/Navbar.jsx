@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Wind, Menu, X, User, LogOut } from 'lucide-react';
@@ -16,6 +16,19 @@ const Navbar = () => {
     navigate('/');
     setIsOpen(false);
   };
+
+  useEffect(() => {
+    const handleGlobalKeydown = (e) => {
+      if (e.key === 'Escape') {
+        setDropdownOpen(false);
+        setIsOpen(false);
+      }
+    };
+    if (dropdownOpen || isOpen) {
+      window.addEventListener('keydown', handleGlobalKeydown);
+    }
+    return () => window.removeEventListener('keydown', handleGlobalKeydown);
+  }, [dropdownOpen, isOpen]);
 
   return (
     <nav className="sticky top-0 z-50 w-full bg-[#FAF9F6]/80 dark:bg-slate-950/80 border-b border-[#E5E7EB]/50 dark:border-slate-800/60 backdrop-blur-md transition-colors duration-300">
@@ -68,6 +81,9 @@ const Navbar = () => {
             <div className="flex items-center gap-3 relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
+                aria-expanded={dropdownOpen}
+                aria-haspopup="true"
+                aria-label="User navigation menu"
                 className="inline-flex items-center gap-1.5 text-xs bg-white border border-[#E5E7EB] text-[#2F3A3F] px-3.5 py-1.5 rounded-2xl font-bold transition-colors hover:bg-slate-50 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer shadow-soft"
                 type="button"
               >
@@ -80,9 +96,14 @@ const Navbar = () => {
               </button>
               
               {dropdownOpen && (
-                <div className="absolute right-0 top-10 w-48 bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-2xl shadow-premium py-2.5 z-50 text-left animate-fade-in select-none">
+                <div 
+                  role="menu"
+                  aria-label="User links"
+                  className="absolute right-0 top-10 w-48 bg-white dark:bg-slate-900 border border-[#E5E7EB] dark:border-slate-800 rounded-2xl shadow-premium py-2.5 z-50 text-left animate-fade-in select-none"
+                >
                   <Link 
                     to="/dashboard" 
+                    role="menuitem"
                     onClick={() => setDropdownOpen(false)}
                     className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                   >
@@ -90,6 +111,7 @@ const Navbar = () => {
                   </Link>
                   <Link 
                     to="/insights" 
+                    role="menuitem"
                     onClick={() => setDropdownOpen(false)}
                     className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                   >
@@ -97,6 +119,7 @@ const Navbar = () => {
                   </Link>
                   <Link 
                     to="/calendar" 
+                    role="menuitem"
                     onClick={() => setDropdownOpen(false)}
                     className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                   >
@@ -104,6 +127,7 @@ const Navbar = () => {
                   </Link>
                   <Link 
                     to="/profile" 
+                    role="menuitem"
                     onClick={() => setDropdownOpen(false)}
                     className="block px-4 py-2 text-xs text-[#2F3A3F] dark:text-slate-300 hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                   >
@@ -112,6 +136,7 @@ const Navbar = () => {
                   <hr className="border-[#E5E7EB] dark:border-slate-800 my-1" />
                   <button 
                     onClick={handleLogout}
+                    role="menuitem"
                     className="w-full text-left block px-4 py-2 text-xs text-[#DC6B6B] hover:bg-[#FAF9F6] dark:hover:bg-slate-800 font-bold transition-colors"
                     type="button"
                   >
@@ -139,6 +164,8 @@ const Navbar = () => {
         {/* Mobile Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-label={isOpen ? "Close main navigation menu" : "Open main navigation menu"}
           className="md:hidden p-1.5 rounded-2xl hover:bg-slate-100/50 dark:hover:bg-slate-900 text-[#2F3A3F] dark:text-slate-200 transition-colors focus:outline-none"
           type="button"
         >

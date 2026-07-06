@@ -8,38 +8,54 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async (tokenVal) => {
     try {
-      const response = await fetch('http://localhost:8000/api/profile', {
+      const response = await fetch('http://localhost:8001/api/profile', {
         headers: {
           'Authorization': `Bearer ${tokenVal}`
         }
       });
       if (response.ok) {
         const data = await response.json();
+        const emailPrefix = data.email.split('@')[0];
+        const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
         setUser({
-          id: 1,
+          id: data.id || 1,
           email: data.email,
-          fullName: data.full_name || 'Student User',
-          displayName: data.display_name || 'Eshniie',
+          fullName: data.full_name || defaultName,
+          displayName: data.display_name || defaultName,
           bio: data.bio || '',
-          profilePicture: data.profile_picture || '',
+          profilePicture: data.profile_picture || '🌱',
           preferredPronouns: data.preferred_pronouns || '',
         });
       } else {
-        // Fallback stub if backend error
+        const email = tokenVal.startsWith("mock_jwt_token_payload_for_") 
+          ? tokenVal.replace("mock_jwt_token_payload_for_", "") 
+          : "user@unwind.com";
+        const emailPrefix = email.split('@')[0];
+        const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
         setUser({
           id: 1,
-          email: 'user@unwind.com',
-          fullName: 'Jane Doe',
-          displayName: 'Eshniie',
+          email: email,
+          fullName: defaultName,
+          displayName: defaultName,
+          bio: '',
+          profilePicture: '🌱',
+          preferredPronouns: '',
         });
       }
     } catch (e) {
-      // Offline fallback
+      const email = tokenVal.startsWith("mock_jwt_token_payload_for_") 
+        ? tokenVal.replace("mock_jwt_token_payload_for_", "") 
+        : "user@unwind.com";
+      const emailPrefix = email.split('@')[0];
+      const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
       setUser({
         id: 1,
-        email: 'user@unwind.com',
-        fullName: 'Jane Doe',
-        displayName: 'Eshniie',
+        email: email,
+        fullName: defaultName,
+        displayName: defaultName,
+        bio: '',
+        profilePicture: '🌱',
+        preferredPronouns: '',
       });
     }
   };
@@ -74,7 +90,7 @@ export const AuthProvider = ({ children }) => {
       
       // Call register backend endpoint (if server is running)
       try {
-        await fetch('http://localhost:8000/api/v1/auth/register', {
+        await fetch('http://localhost:8001/api/v1/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, full_name: fullName })
