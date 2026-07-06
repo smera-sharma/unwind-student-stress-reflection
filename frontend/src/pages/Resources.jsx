@@ -1,9 +1,53 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Component } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { wellnessArticles } from '../data/wellnessArticles';
-import { Search, Bookmark, BookOpen, HeartHandshake, X, Play, ChevronRight, Info, Calendar, Phone } from 'lucide-react';
+import { Search, Bookmark, BookOpen, HeartHandshake, X, Play, ChevronRight, Info, Calendar, Phone, Trash2 } from 'lucide-react';
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Resources Error Boundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex-grow flex items-center justify-center min-h-[50vh] p-8 text-center select-none">
+          <div className="bg-rose-50/50 dark:bg-rose-950/10 border border-rose-100 dark:border-rose-950/50 rounded-3xl p-8 max-w-md w-full space-y-4 shadow-soft">
+            <span className="text-3xl block">⚠️</span>
+            <h3 className="text-base font-extrabold text-rose-900 dark:text-rose-350">
+              Something went wrong while loading Resources.
+            </h3>
+            <p className="text-xs text-rose-800/80 dark:text-rose-450 font-semibold leading-relaxed">
+              We encountered an unexpected runtime error.
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={() => window.location.reload()}
+                className="inline-flex items-center justify-center font-medium transition-all duration-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[#6B8E7A] hover:bg-[#587665] text-white focus:ring-[#6B8E7A] shadow-soft hover:scale-[1.02] active:scale-[0.98] !py-2.5 !px-6 text-xs font-bold uppercase tracking-wider"
+                type="button"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const Resources = () => {
   const { user } = useAuth();
@@ -57,10 +101,18 @@ const Resources = () => {
     const saved = localStorage.getItem(bookmarksKey);
     if (saved) {
       try {
-        setBookmarkedIds(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          setBookmarkedIds(parsed);
+        } else {
+          setBookmarkedIds([]);
+        }
       } catch (e) {
         console.error("Could not parse bookmarks:", e);
+        setBookmarkedIds([]);
       }
+    } else {
+      setBookmarkedIds([]);
     }
     const lastRead = localStorage.getItem('continue_reading_article_id');
     if (lastRead) {
@@ -113,11 +165,13 @@ const Resources = () => {
   // Sync bookmarks
   const toggleBookmark = (id, e) => {
     if (e) e.stopPropagation();
+    if (!id) return;
+    const currentIds = Array.isArray(bookmarkedIds) ? bookmarkedIds : [];
     let updated;
-    if (bookmarkedIds.includes(id)) {
-      updated = bookmarkedIds.filter(item => item !== id);
+    if (currentIds.includes(id)) {
+      updated = currentIds.filter(item => item !== id);
     } else {
-      updated = [...bookmarkedIds, id];
+      updated = [...currentIds, id];
     }
     setBookmarkedIds(updated);
     localStorage.setItem(bookmarksKey, JSON.stringify(updated));
@@ -125,6 +179,7 @@ const Resources = () => {
 
   // Open article details and save reading resume point
   const handleOpenArticle = (art) => {
+    if (!art) return;
     setActiveArticle(art);
     setContinueReadingId(art.id);
     localStorage.setItem('continue_reading_article_id', art.id);
@@ -141,24 +196,33 @@ const Resources = () => {
     const diff = new Date() - start;
     const oneDay = 1000 * 60 * 60 * 24;
     const day = Math.floor(diff / oneDay);
-    return day % wellnessArticles.length;
+    const len = Array.isArray(wellnessArticles) ? wellnessArticles.length : 0;
+    return len > 0 ? day % len : 0;
   };
-  const dailyArticle = wellnessArticles[getDailyIndex()];
+  const dailyArticle = Array.isArray(wellnessArticles) && wellnessArticles.length > 0 ? wellnessArticles[getDailyIndex()] : null;
 
   // Filtered articles list matching category, search bar
-  const filteredArticles = wellnessArticles.filter(art => {
+  const filteredArticles = (Array.isArray(wellnessArticles) ? wellnessArticles : []).filter(art => {
+    if (!art) return false;
     const matchesCategory = selectedCategory === 'All' || art.category === selectedCategory;
-    const query = searchQuery.toLowerCase();
+    const query = (searchQuery || '').toLowerCase();
+    const title = (art.title || '').toLowerCase();
+    const summary = (art.summary || '').toLowerCase();
+    const category = (art.category || '').toLowerCase();
+    const tags = Array.isArray(art.tags) ? art.tags : [];
+    
     const matchesSearch =
-      art.title.toLowerCase().includes(query) ||
-      art.summary.toLowerCase().includes(query) ||
-      art.tags.some(t => t.toLowerCase().includes(query)) ||
-      art.category.toLowerCase().includes(query);
+      title.includes(query) ||
+      summary.includes(query) ||
+      tags.some(t => t?.toLowerCase().includes(query)) ||
+      category.includes(query);
     return matchesCategory && matchesSearch;
   });
 
   // Bookmarked articles list
-  const bookmarkedArticles = wellnessArticles.filter(art => bookmarkedIds.includes(art.id));
+  const bookmarkedArticles = (Array.isArray(wellnessArticles) ? wellnessArticles : []).filter(art => 
+    art && Array.isArray(bookmarkedIds) && bookmarkedIds.includes(art.id)
+  );
 
   // Exercise structures
   const exercises = [
@@ -282,6 +346,12 @@ const Resources = () => {
     setGroundingStep(0);
   };
 
+  const handleInlineReset = () => {
+    setInlineActive(false);
+    setInlinePhase('Breathe In');
+    setInlineTimeLeft(4);
+  };
+
   const resumeArticleObj = continueReadingId ? wellnessArticles.find(a => a.id === continueReadingId) : null;
 
   return (
@@ -308,7 +378,7 @@ const Resources = () => {
                 {dailyArticle?.summary}
               </p>
               <div className="flex flex-wrap gap-1.5">
-                {dailyArticle?.tags.map(t => (
+                {dailyArticle?.tags?.map(t => (
                   <span key={t} className="text-[9px] font-bold bg-[#FAF9F6] border border-slate-200/50 text-[#2F3A3F] dark:bg-slate-950 dark:border-slate-800 dark:text-slate-350 px-2 py-0.5 rounded-full select-none">
                     #{t}
                   </span>
@@ -582,9 +652,9 @@ const Resources = () => {
               {groundingTab === '54321' ? (
                 <div className="space-y-4 flex-grow flex flex-col justify-between py-2">
                   <div className="space-y-2">
-                    <h5 className="text-sm font-extrabold text-[#587665] dark:text-emerald-400">{groundingInstructions[groundingActiveStep].label}</h5>
+                    <h5 className="text-sm font-extrabold text-[#587665] dark:text-emerald-400">{groundingInstructions[groundingActiveStep]?.label}</h5>
                     <p className="text-xs text-[#6B7280] dark:text-slate-400 font-semibold leading-relaxed">
-                      {groundingInstructions[groundingActiveStep].desc}
+                      {groundingInstructions[groundingActiveStep]?.desc}
                     </p>
                   </div>
                   
@@ -611,9 +681,9 @@ const Resources = () => {
               ) : (
                 <div className="space-y-4 flex-grow flex flex-col justify-between py-2">
                   <div className="space-y-2">
-                    <h5 className="text-sm font-extrabold text-[#587665] dark:text-emerald-400">PMR Group: {pmrSteps[groundingActiveStep].part}</h5>
+                    <h5 className="text-sm font-extrabold text-[#587665] dark:text-emerald-400">PMR Group: {pmrSteps[groundingActiveStep]?.part}</h5>
                     <p className="text-xs text-[#6B7280] dark:text-slate-400 font-semibold leading-relaxed">
-                      {pmrSteps[groundingActiveStep].desc}
+                      {pmrSteps[groundingActiveStep]?.desc}
                     </p>
                   </div>
                   
@@ -829,36 +899,36 @@ const Resources = () => {
               <X size={18} />
             </button>
 
-            <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">{activeArticle.category}</span>
-            <h3 className="text-xl font-bold text-[#2F3A3F] dark:text-slate-100 leading-tight">{activeArticle.title}</h3>
+            <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">{activeArticle?.category}</span>
+            <h3 className="text-xl font-bold text-[#2F3A3F] dark:text-slate-100 leading-tight">{activeArticle?.title}</h3>
             
             <div className="flex items-center gap-2 select-none">
               <span className="text-[9px] font-bold bg-[#FAF9F6] border border-slate-200/50 text-[#2F3A3F] dark:bg-slate-950 dark:border-slate-800 dark:text-slate-350 px-2 py-0.5 rounded-full">
-                {activeArticle.duration}
+                {activeArticle?.duration}
               </span>
               <button
-                onClick={() => toggleBookmark(activeArticle.id)}
+                onClick={() => activeArticle?.id && toggleBookmark(activeArticle.id)}
                 className={`flex items-center gap-1 text-[9px] font-bold border px-2.5 py-0.5 rounded-full transition-colors focus:outline-none ${
-                  bookmarkedIds.includes(activeArticle.id)
+                  activeArticle?.id && bookmarkedIds.includes(activeArticle.id)
                     ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/30'
                     : 'border-slate-200 dark:border-slate-850 text-slate-500'
                 }`}
                 type="button"
               >
-                <Bookmark size={9} /> {bookmarkedIds.includes(activeArticle.id) ? 'Saved' : 'Save'}
+                <Bookmark size={9} /> {activeArticle?.id && bookmarkedIds.includes(activeArticle.id) ? 'Saved' : 'Save'}
               </button>
             </div>
 
             <p className="text-sm font-semibold text-[#2F3A3F] dark:text-slate-250 italic leading-relaxed border-l-2 border-[#6B8E7A] pl-3 py-1">
-              "{activeArticle.summary}"
+              "{activeArticle?.summary}"
             </p>
 
             <div className="text-xs sm:text-sm text-[#2F3A3F] dark:text-slate-300 leading-relaxed space-y-4 font-medium whitespace-pre-line">
-              {activeArticle.content}
+              {activeArticle?.content}
             </div>
 
             <div className="flex flex-wrap gap-2 pt-2 select-none">
-              {activeArticle.tags.map(t => (
+              {activeArticle?.tags?.map(t => (
                 <span key={t} className="text-[10px] font-bold bg-[#FAF9F6] border border-slate-200/50 text-[#2F3A3F] dark:bg-slate-950 dark:border-slate-850 dark:text-slate-400 px-3 py-1 rounded-full">
                   #{t}
                 </span>
@@ -883,11 +953,11 @@ const Resources = () => {
 
             <div>
               <span className="text-[10px] font-bold text-[#89A8B2] tracking-wider uppercase block">Active Exercise</span>
-              <h3 className="text-lg font-bold text-[#2F3A3F] dark:text-slate-100">{activeExercise.title}</h3>
+              <h3 className="text-lg font-bold text-[#2F3A3F] dark:text-slate-100">{activeExercise?.title}</h3>
             </div>
 
             {/* Breathing Exercises States Timer */}
-            {(activeExercise.id === '478_breath' || activeExercise.id === 'box_breath') && (
+            {(activeExercise?.id === '478_breath' || activeExercise?.id === 'box_breath') && (
               <div className="space-y-6 py-4">
                 <div className="w-32 h-32 rounded-full border-4 border-[#6B8E7A]/40 dark:border-emerald-500/25 flex flex-col items-center justify-center mx-auto shadow-soft bg-[#FAF9F6] dark:bg-slate-950 transition-all duration-1000 scale-105 animate-pulse">
                   <span className="text-xs font-bold text-[#89A8B2] uppercase">Time</span>
@@ -903,12 +973,12 @@ const Resources = () => {
             )}
 
             {/* Grounding Exercise Steps */}
-            {activeExercise.id === '54321_grounding' && (
+            {activeExercise?.id === '54321_grounding' && (
               <div className="space-y-6 py-4 text-left">
                 <div className="p-4 bg-[#FAF9F6] dark:bg-slate-950 rounded-2xl border border-[#E5E7EB] dark:border-slate-850 space-y-2">
-                  <span className="text-xs font-extrabold text-[#587665] dark:text-emerald-450 block">{groundingInstructions[groundingStep].label}</span>
+                  <span className="text-xs font-extrabold text-[#587665] dark:text-emerald-450 block">{groundingInstructions[groundingStep]?.label}</span>
                   <p className="text-xs text-[#2F3A3F] dark:text-slate-350 leading-relaxed font-semibold">
-                    {groundingInstructions[groundingStep].desc}
+                    {groundingInstructions[groundingStep]?.desc}
                   </p>
                 </div>
 
@@ -928,12 +998,12 @@ const Resources = () => {
             )}
 
             {/* PMR Steps */}
-            {activeExercise.id === 'pmr_relaxation' && (
+            {activeExercise?.id === 'pmr_relaxation' && (
               <div className="space-y-6 py-4 text-left">
                 <div className="p-4 bg-[#FAF9F6] dark:bg-slate-950 rounded-2xl border border-[#E5E7EB] dark:border-slate-850 space-y-2">
-                  <span className="text-xs font-extrabold text-[#587665] dark:text-emerald-450 block">Target: {pmrSteps[groundingStep].part}</span>
+                  <span className="text-xs font-extrabold text-[#587665] dark:text-emerald-450 block">Target: {pmrSteps[groundingStep]?.part}</span>
                   <p className="text-xs text-[#2F3A3F] dark:text-slate-350 leading-relaxed font-semibold">
-                    {pmrSteps[groundingStep].desc}
+                    {pmrSteps[groundingStep]?.desc}
                   </p>
                 </div>
 
@@ -959,11 +1029,12 @@ const Resources = () => {
   );
 };
 
-// Trash2 SVG path icon fallback to keep bundle size thin and clean
-const Trash2 = ({ className }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/>
-  </svg>
+
+
+const ResourcesWithBoundary = (props) => (
+  <ErrorBoundary>
+    <Resources {...props} />
+  </ErrorBoundary>
 );
 
-export default Resources;
+export default ResourcesWithBoundary;
