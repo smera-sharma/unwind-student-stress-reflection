@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import { apiService } from '../services/api';
+import { safeStorage } from '../utils/storage';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { MessageSquare, Send, Trash2, Edit3, Plus, Search, Download, Sparkles, Check, X, Menu } from 'lucide-react';
@@ -23,24 +24,17 @@ const Luna = () => {
 
   // 1. Initial Load of Chat Histories
   useEffect(() => {
-    const saved = localStorage.getItem(chatKey);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setConversations(parsed);
-        if (parsed.length > 0) {
-          setActiveConvId(parsed[0].id);
-        }
-      } catch (e) {
-        console.error("Could not parse conversation history:", e);
-      }
+    const parsed = safeStorage.getItem(chatKey, []);
+    setConversations(parsed);
+    if (parsed.length > 0) {
+      setActiveConvId(parsed[0].id);
     }
   }, [chatKey]);
 
   // 2. Helper: Sync to LocalStorage
   const syncConversations = (updated) => {
     setConversations(updated);
-    localStorage.setItem(chatKey, JSON.stringify(updated));
+    safeStorage.setItem(chatKey, updated);
   };
 
   // Auto-resize textarea height on content change
@@ -77,11 +71,8 @@ const Luna = () => {
   // Extract memory logs
   const getReflectionMemory = () => {
     try {
-      const historySaved = localStorage.getItem('reflectionHistory');
-      if (historySaved) {
-        const historyList = JSON.parse(historySaved);
-        return historyList.slice(0, 3).map(log => `${log.date}: Mood ${log.mood} - ${log.text}`);
-      }
+      const historyList = safeStorage.getItem('reflectionHistory', []);
+      return historyList.slice(0, 3).map(log => `${log.date}: Mood ${log.mood} - ${log.text || log.journal || ''}`);
     } catch (e) {
       console.warn("Could not read reflection logs for AI memory:", e);
     }
@@ -220,20 +211,20 @@ const Luna = () => {
     setIsLoading(true);
 
     try {
-      const todayMood = localStorage.getItem('todayMood') || 'Neutral';
+      const todayMood = safeStorage.getItem('todayMood', 'Neutral');
       const recentMemory = getReflectionMemory();
 
       // Backend conversation API query
-      const response = await api.post('/ai/chat', {
-        messages: nextMessages.map(m => ({ role: m.role, content: m.content })),
-        mood: todayMood,
-        memory: recentMemory
-      });
+      const data = await apiService.ai.chat(
+        nextMessages.map(m => ({ role: m.role, content: m.content })),
+        todayMood,
+        recentMemory
+      );
 
       const companionMessage = {
         id: `msg_${Date.now() + 1}`,
         role: 'model',
-        content: response.data.response,
+        content: data.response,
         timestamp: new Date().toISOString()
       };
 

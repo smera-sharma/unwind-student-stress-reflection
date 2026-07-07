@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import { apiService } from '../../services/api';
+import { safeStorage } from '../../utils/storage';
 import Card from '../ui/Card';
 
 const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflectionRef }) => {
@@ -101,30 +102,21 @@ const AIReflectionCard = ({ journal = '', selectedMood = 'Neutral', aiReflection
     const cacheKey = `aiReflection_${todayStr}_${selectedMood}_${journalText}`;
 
     // Read cache check
-    const cached = localStorage.getItem('aiReflectionCache');
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        if (parsed.key === cacheKey) {
-          setReflectionData(parsed.data);
-          setIsLoading(false);
-          return;
-        }
-      } catch (e) {
-        localStorage.removeItem('aiReflectionCache');
-      }
+    const parsed = safeStorage.getItem('aiReflectionCache');
+    if (parsed && parsed.key === cacheKey) {
+      setReflectionData(parsed.data);
+      setIsLoading(false);
+      return;
+    } else if (parsed) {
+      safeStorage.removeItem('aiReflectionCache');
     }
 
     const fetchReflection = async () => {
       setIsLoading(true);
       try {
-        const response = await api.post('/ai/reflection', {
-          journal: journalText,
-          mood: selectedMood || 'Neutral'
-        });
-        const responseData = response.data;
+        const responseData = await apiService.ai.getReflection(journalText, selectedMood || 'Neutral');
         setReflectionData(responseData);
-        localStorage.setItem('aiReflectionCache', JSON.stringify({ key: cacheKey, data: responseData }));
+        safeStorage.setItem('aiReflectionCache', { key: cacheKey, data: responseData });
       } catch (err) {
         console.warn("AI Reflection API call failed, falling back to heuristics:", err);
         const fallback = runLocalHeuristics(journalText, selectedMood);

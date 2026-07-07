@@ -10,8 +10,8 @@ from app.core import security
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserOut)
-def register(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
+@router.post("/register")
+def register(user_in: UserCreate, db: Session = Depends(get_db)):
     """
     Register a new user in the database.
     Checks if email already exists, hashes the password using security stubs,
@@ -37,17 +37,33 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)) -> User:
     )
     
     # Save user
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+    try:
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create user: {str(e)}"
+        )
     
-    return user
+    return {
+        "success": True,
+        "message": "User registered successfully.",
+        "data": {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "is_active": user.is_active
+        }
+    }
 
-@router.post("/login", response_model=Token)
+@router.post("/login")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(), 
     db: Session = Depends(get_db)
-) -> dict:
+):
     """
     Log in user using OAuth2 standard password flow.
     Queries the database, validates password hash verify stubs, and issues JWT payload access token.
@@ -66,4 +82,11 @@ def login(
     # Generate token using security stubs
     access_token = security.create_access_token(subject=user.email)
     
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "success": True,
+        "message": "Login successful.",
+        "data": {
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
+    }

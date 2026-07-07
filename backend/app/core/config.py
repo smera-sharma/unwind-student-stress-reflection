@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./unwind.db"
     
     # JWT security stubs configuration (skeletons for future sprints)
+    SECRET_KEY: str = "your_super_secret_jwt_key_placeholder_change_in_production"
     JWT_SECRET_KEY: str = "your_super_secret_jwt_key_placeholder_change_in_production"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -19,6 +20,10 @@ class Settings(BaseSettings):
         "http://localhost:8000",
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:5175",
+        "http://127.0.0.1:5175",
     ]
 
     # Look for .env file at the workspace root or backend root
@@ -28,5 +33,11 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore"
     )
+
+    def __init__(self, **values):
+        super().__init__(**values)
+        if self.JWT_SECRET_KEY == "your_super_secret_jwt_key_placeholder_change_in_production":
+            if self.SECRET_KEY and self.SECRET_KEY != "your_super_secret_jwt_key_placeholder_change_in_production":
+                self.JWT_SECRET_KEY = self.SECRET_KEY
 
 settings = Settings()

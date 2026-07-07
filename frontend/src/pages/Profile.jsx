@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api';
+import { apiService } from '../services/api';
+import { safeStorage } from '../utils/storage';
 import { useAuth } from '../contexts/AuthContext';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -41,28 +42,28 @@ const Profile = () => {
     const loadProfileData = async () => {
       setIsLoading(true);
       try {
-        const [profRes, settRes] = await Promise.all([
-          api.get('/profile'),
-          api.get('/settings')
+        const [profData, settData] = await Promise.all([
+          apiService.profile.getProfile(),
+          apiService.profile.getSettings()
         ]);
         
         setProfileForm({
-          fullName: profRes.data.full_name || '',
-          displayName: profRes.data.display_name || '',
-          email: profRes.data.email || '',
-          bio: profRes.data.bio || '',
-          profilePicture: profRes.data.profile_picture || '🌱',
-          preferredPronouns: profRes.data.preferred_pronouns || ''
+          fullName: profData.full_name || '',
+          displayName: profData.display_name || '',
+          email: profData.email || '',
+          bio: profData.bio || '',
+          profilePicture: profData.profile_picture || '🌱',
+          preferredPronouns: profData.preferred_pronouns || ''
         });
 
-        const localNotifSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+        const localNotifSettings = safeStorage.getItem('notificationSettings') || {};
 
         setSettingsForm({
-          theme: settRes.data.theme || 'system',
-          dailyReminder: settRes.data.daily_reminder || false,
-          reminderTime: settRes.data.reminder_time || '20:00',
-          timezone: settRes.data.timezone || 'UTC',
-          notificationsEnabled: settRes.data.notifications_enabled !== false,
+          theme: settData.theme || 'system',
+          dailyReminder: settData.daily_reminder || false,
+          reminderTime: settData.reminder_time || '20:00',
+          timezone: settData.timezone || 'UTC',
+          notificationsEnabled: settData.notifications_enabled !== false,
           weeklyReminders: localNotifSettings.weeklyReminders !== false,
           motivationalMessages: localNotifSettings.motivationalMessages !== false,
           quietHoursEnabled: !!localNotifSettings.quietHoursEnabled,
@@ -71,7 +72,7 @@ const Profile = () => {
         });
       } catch (err) {
         console.warn("Failed loading profile from backend. Using local context fallback.", err);
-        const localNotifSettings = JSON.parse(localStorage.getItem('notificationSettings') || '{}');
+        const localNotifSettings = safeStorage.getItem('notificationSettings') || {};
         const email = user?.email || 'user@unwind.com';
         const emailPrefix = email.split('@')[0];
         const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
@@ -121,7 +122,7 @@ const Profile = () => {
     e.preventDefault();
     setIsSavingProfile(true);
     try {
-      const response = await api.put('/profile', {
+      const data = await apiService.profile.updateProfile({
         full_name: profileForm.fullName,
         display_name: profileForm.displayName,
         bio: profileForm.bio,
@@ -129,7 +130,6 @@ const Profile = () => {
         preferred_pronouns: profileForm.preferredPronouns
       });
       
-      const data = response.data;
       setProfileForm({
         fullName: data.full_name || '',
         displayName: data.display_name || '',
@@ -143,14 +143,8 @@ const Profile = () => {
       showToast('✓ Profile Updated', 'Profile updated successfully.');
     } catch (err) {
       console.error("Profile save failed:", err);
-      const isNetError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK');
-      const statusText = err.response 
-        ? `${err.response.status} ${err.response.statusText || ''}`.trim() 
-        : (isNetError ? 'Service Unavailable' : 'Error');
-      const detailMsg = err.response?.data?.detail 
-        || (isNetError ? 'Backend server is offline. Please verify it is running on port 8001.' : err.message)
-        || 'Failed to update profile.';
-      showToast(`❌ Save Failed (${statusText})`, detailMsg);
+      const backendMsg = err.response?.data?.message || err.message || 'Failed to update profile.';
+      showToast(`❌ Save Failed`, backendMsg);
     } finally {
       setIsSavingProfile(false);
     }
@@ -160,7 +154,7 @@ const Profile = () => {
     e.preventDefault();
     setIsSavingSettings(true);
     try {
-      const response = await api.put('/settings', {
+      const data = await apiService.profile.updateSettings({
         theme: settingsForm.theme,
         daily_reminder: settingsForm.dailyReminder,
         reminder_time: settingsForm.reminderTime,
@@ -168,8 +162,6 @@ const Profile = () => {
         notifications_enabled: settingsForm.notificationsEnabled
       });
 
-      const data = response.data;
-      
       const extSettings = {
         weeklyReminders: settingsForm.weeklyReminders,
         motivationalMessages: settingsForm.motivationalMessages,
@@ -177,8 +169,8 @@ const Profile = () => {
         quietHoursStart: settingsForm.quietHoursStart,
         quietHoursEnd: settingsForm.quietHoursEnd
       };
-      localStorage.setItem('notificationSettings', JSON.stringify(extSettings));
-      localStorage.setItem('reminderTime', settingsForm.reminderTime);
+      safeStorage.setItem('notificationSettings', extSettings);
+      safeStorage.setItem('reminderTime', settingsForm.reminderTime);
 
       setSettingsForm({
         theme: data.theme || 'system',
@@ -193,19 +185,13 @@ const Profile = () => {
         quietHoursEnd: settingsForm.quietHoursEnd
       });
 
-      localStorage.setItem('theme', data.theme || 'system');
+      safeStorage.setItem('theme', data.theme || 'system');
       await refreshUser();
       showToast('✓ Settings Saved', 'Preferences updated successfully.');
     } catch (err) {
       console.error("Settings save failed:", err);
-      const isNetError = !err.response && (err.message === 'Network Error' || err.code === 'ERR_NETWORK');
-      const statusText = err.response 
-        ? `${err.response.status} ${err.response.statusText || ''}`.trim() 
-        : (isNetError ? 'Service Unavailable' : 'Error');
-      const detailMsg = err.response?.data?.detail 
-        || (isNetError ? 'Backend server is offline. Please verify it is running on port 8001.' : err.message)
-        || 'Failed to update settings.';
-      showToast(`❌ Save Failed (${statusText})`, detailMsg);
+      const backendMsg = err.response?.data?.message || err.message || 'Failed to update settings.';
+      showToast(`❌ Save Failed`, backendMsg);
     } finally {
       setIsSavingSettings(false);
     }
@@ -213,8 +199,8 @@ const Profile = () => {
 
   // Privacy Actions
   const handleExportJournal = () => {
-    const historyData = localStorage.getItem('reflectionHistory') || '[]';
-    const blob = new Blob([historyData], { type: 'application/json' });
+    const reflections = safeStorage.getItem('reflectionHistory', []);
+    const blob = new Blob([JSON.stringify(reflections, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -228,9 +214,9 @@ const Profile = () => {
     const allData = {
       profile: profileForm,
       settings: settingsForm,
-      history: JSON.parse(localStorage.getItem('reflectionHistory') || '[]'),
-      streak: localStorage.getItem('reflectionStreak') || '4',
-      todayMood: localStorage.getItem('todayMood') || ''
+      history: safeStorage.getItem('reflectionHistory', []),
+      streak: safeStorage.getItem('reflectionStreak', '4'),
+      todayMood: safeStorage.getItem('todayMood', '')
     };
     const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);

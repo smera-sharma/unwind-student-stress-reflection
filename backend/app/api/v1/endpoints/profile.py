@@ -24,7 +24,7 @@ class SettingsUpdate(BaseModel):
 
 @router.get("/profile")
 def get_profile(current_user: User = Depends(deps.get_current_user)):
-    return {
+    profile_data = {
         "email": current_user.email,
         "full_name": current_user.full_name,
         "display_name": current_user.display_name,
@@ -33,6 +33,11 @@ def get_profile(current_user: User = Depends(deps.get_current_user)):
         "preferred_pronouns": current_user.preferred_pronouns,
         "created_at": current_user.created_at,
         "updated_at": current_user.updated_at
+    }
+    return {
+        "success": True,
+        "message": "Profile retrieved successfully.",
+        "data": profile_data
     }
 
 @router.put("/profile")
@@ -52,19 +57,43 @@ def update_profile(
     if data.preferred_pronouns is not None:
         current_user.preferred_pronouns = data.preferred_pronouns
 
-    db.add(current_user)
-    db.commit()
-    db.refresh(current_user)
-    return get_profile(current_user)
+    try:
+        db.add(current_user)
+        db.commit()
+        db.refresh(current_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update profile: {str(e)}")
+
+    profile_data = {
+        "email": current_user.email,
+        "full_name": current_user.full_name,
+        "display_name": current_user.display_name,
+        "bio": current_user.bio,
+        "profile_picture": current_user.profile_picture,
+        "preferred_pronouns": current_user.preferred_pronouns,
+        "created_at": current_user.created_at,
+        "updated_at": current_user.updated_at
+    }
+    return {
+        "success": True,
+        "message": "Profile updated successfully.",
+        "data": profile_data
+    }
 
 @router.get("/settings")
 def get_settings(current_user: User = Depends(deps.get_current_user)):
-    return {
+    settings_data = {
         "theme": current_user.theme or "system",
         "daily_reminder": current_user.daily_reminder or False,
         "reminder_time": current_user.reminder_time or "20:00",
         "timezone": current_user.timezone or "UTC",
         "notifications_enabled": current_user.notifications_enabled if current_user.notifications_enabled is not None else True
+    }
+    return {
+        "success": True,
+        "message": "Settings retrieved successfully.",
+        "data": settings_data
     }
 
 @router.put("/settings")
@@ -84,7 +113,23 @@ def update_settings(
     if data.notifications_enabled is not None:
         current_user.notifications_enabled = data.notifications_enabled
 
-    db.add(current_user)
-    db.commit()
-    db.refresh(current_user)
-    return get_settings(current_user)
+    try:
+        db.add(current_user)
+        db.commit()
+        db.refresh(current_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update settings: {str(e)}")
+
+    settings_data = {
+        "theme": current_user.theme or "system",
+        "daily_reminder": current_user.daily_reminder or False,
+        "reminder_time": current_user.reminder_time or "20:00",
+        "timezone": current_user.timezone or "UTC",
+        "notifications_enabled": current_user.notifications_enabled if current_user.notifications_enabled is not None else True
+    }
+    return {
+        "success": True,
+        "message": "Settings updated successfully.",
+        "data": settings_data
+    }

@@ -83,12 +83,39 @@ def heuristic_fallback(journal: str, mood: str):
         "is_fallback": True
     }
 
+def call_gemini_api(url: str, payload: dict, timeout: int = 10, max_attempts: int = 2) -> dict:
+    """
+    Calls the Gemini API using urllib with retry logic and timeout handling.
+    """
+    import time
+    for attempt in range(1, max_attempts + 1):
+        try:
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode('utf-8'),
+                headers={'Content-Type': 'application/json'},
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=timeout) as response:
+                res_data = response.read().decode('utf-8')
+                return json.loads(res_data)
+        except Exception as e:
+            logger.warning(f"Gemini API attempt {attempt} failed: {e}")
+            if attempt == max_attempts:
+                raise e
+            time.sleep(1)
+
 @router.post("/reflection")
 def generate_ai_reflection(data: ReflectionRequest):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "mock_api_key_placeholder":
         logger.warning("GEMINI_API_KEY environment variable is missing or placeholder. Running fallback.")
-        return heuristic_fallback(data.journal, data.mood)
+        fallback = heuristic_fallback(data.journal, data.mood)
+        return {
+            "success": True,
+            "message": "AI reflection generated via fallback heuristics.",
+            "data": fallback
+        }
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     
@@ -123,30 +150,31 @@ JSON Format:
     }
 
     try:
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode('utf-8'),
-            headers={'Content-Type': 'application/json'},
-            method='POST'
-        )
-        with urllib.request.urlopen(req, timeout=10) as response:
-            res_data = response.read().decode('utf-8')
-            res_json = json.loads(res_data)
-            content = res_json['candidates'][0]['content']['parts'][0]['text']
-            parsed = json.loads(content)
-            
-            if all(k in parsed for k in ["summary", "themes", "reflection", "suggestions"]):
-                return {
+        res_json = call_gemini_api(url, payload, timeout=10, max_attempts=2)
+        content = res_json['candidates'][0]['content']['parts'][0]['text']
+        parsed = json.loads(content)
+        
+        if all(k in parsed for k in ["summary", "themes", "reflection", "suggestions"]):
+            return {
+                "success": True,
+                "message": "AI reflection generated successfully.",
+                "data": {
                     "summary": parsed["summary"],
                     "themes": parsed["themes"],
                     "reflection": parsed["reflection"],
                     "suggestions": parsed["suggestions"],
                     "is_fallback": False
                 }
+            }
     except Exception as e:
         logger.error(f"Gemini API call failed: {e}. Falling back to heuristics.")
 
-    return heuristic_fallback(data.journal, data.mood)
+    fallback = heuristic_fallback(data.journal, data.mood)
+    return {
+        "success": True,
+        "message": "AI reflection generated via fallback heuristics.",
+        "data": fallback
+    }
 
 class ChatMessage(BaseModel):
     role: str
@@ -195,7 +223,14 @@ def chat_with_companion(data: ChatRequest):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "mock_api_key_placeholder":
         logger.warning("GEMINI_API_KEY environment variable is missing or placeholder. Running chat fallback.")
-        return {"response": chat_heuristic_fallback(data.messages, data.mood)}
+        fallback_resp = chat_heuristic_fallback(data.messages, data.mood)
+        return {
+            "success": True,
+            "message": "Chat response generated via fallback heuristics.",
+            "data": {
+                "response": fallback_resp
+            }
+        }
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     
@@ -254,18 +289,23 @@ Conversation history:
     }
 
     try:
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode('utf-8'),
-            headers={'Content-Type': 'application/json'},
-            method='POST'
-        )
-        with urllib.request.urlopen(req, timeout=10) as response:
-            res_data = response.read().decode('utf-8')
-            res_json = json.loads(res_data)
-            content = res_json['candidates'][0]['content']['parts'][0]['text'].strip()
-            return {"response": content}
+        res_json = call_gemini_api(url, payload, timeout=10, max_attempts=2)
+        content = res_json['candidates'][0]['content']['parts'][0]['text'].strip()
+        return {
+            "success": True,
+            "message": "Chat response generated successfully.",
+            "data": {
+                "response": content
+            }
+        }
     except Exception as e:
         logger.error(f"Gemini API call failed for chat: {e}. Falling back to heuristics.")
         
-    return {"response": chat_heuristic_fallback(data.messages, data.mood)}
+    fallback_resp = chat_heuristic_fallback(data.messages, data.mood)
+    return {
+        "success": True,
+        "message": "Chat response generated via fallback heuristics.",
+        "data": {
+            "response": fallback_resp
+        }
+    }

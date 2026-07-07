@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import api from '../services/api';
+import { apiService } from '../services/api';
+import { safeStorage } from '../utils/storage';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { 
@@ -30,8 +31,7 @@ const Insights = () => {
   // Load centralized localStorage states
   useEffect(() => {
     // 1. Get reflection history
-    const savedHistory = localStorage.getItem('reflectionHistory');
-    const historyList = savedHistory ? JSON.parse(savedHistory) : [
+    const historyList = safeStorage.getItem('reflectionHistory') || [
       { date: 'Thursday, July 2', mood: 'Good', text: 'Finished the research paper outline today. Felt good to get that milestone out of the way.' },
       { date: 'Wednesday, July 1', mood: 'Stressed', text: 'Midterm exam prep is taking up all my energy. I feel stressed and tired.' },
       { date: 'Tuesday, June 30', mood: 'Neutral', text: 'A normal day. Attended lectures, read at the library, and walked around the park.' },
@@ -40,7 +40,7 @@ const Insights = () => {
     setHistory(historyList);
 
     // 2. Get streak
-    const savedStreak = parseInt(localStorage.getItem('reflectionStreak') || '4', 10);
+    const savedStreak = parseInt(safeStorage.getItem('reflectionStreak', '4'), 10);
     setStreak(savedStreak);
   }, []);
 
@@ -49,20 +49,15 @@ const Insights = () => {
     if (history.length === 0) return;
 
     const cacheKey = 'monthlySummaryCache';
-    const cachedData = localStorage.getItem(cacheKey);
+    const parsed = safeStorage.getItem(cacheKey);
     const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000;
     const now = Date.now();
 
-    if (cachedData) {
-      try {
-        const parsed = JSON.parse(cachedData);
-        if (now - parsed.timestamp < sevenDaysInMs) {
-          setSummary(parsed.summary);
-          return;
-        }
-      } catch (e) {
-        localStorage.removeItem(cacheKey);
-      }
+    if (parsed && parsed.timestamp && now - parsed.timestamp < sevenDaysInMs) {
+      setSummary(parsed.summary);
+      return;
+    } else if (parsed) {
+      safeStorage.removeItem(cacheKey);
     }
 
     // Trigger API call to generate new summary
@@ -76,18 +71,15 @@ const Insights = () => {
           journal: item.text
         }));
 
-        const response = await api.post('/ai/monthly-summary', {
-          reflections: reflectionsPayload
-        });
-        
-        const reviewText = response.data.summary;
+        const data = await apiService.ai.getMonthlySummary(reflectionsPayload);
+        const reviewText = data.summary;
         setSummary(reviewText);
         
         // Cache the newly fetched summary
-        localStorage.setItem(cacheKey, JSON.stringify({
+        safeStorage.setItem(cacheKey, {
           timestamp: now,
           summary: reviewText
-        }));
+        });
       } catch (err) {
         console.warn("Failed fetching monthly review. Emulating locally.");
         const fallbackText = "This month you've shown remarkable consistency. Early reflections focused on deadlines and stress, while later entries included more gratitude and confidence. Your journaling habit has become more regular.";

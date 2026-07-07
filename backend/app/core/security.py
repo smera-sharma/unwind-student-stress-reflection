@@ -1,24 +1,40 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any, Union
+import jwt
+from passlib.context import CryptContext
+from app.core.config import settings
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_password_hash(password: str) -> str:
     """
-    Password hashing skeleton.
-    Future sprints: return pwd_context.hash(password) using passlib.
+    Hashes a password using bcrypt.
     """
-    return f"mock_hashed_{password}"
+    return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
-    Password verification skeleton.
-    Future sprints: return pwd_context.verify(plain_password, hashed_password).
+    Verifies a plain password against its bcrypt hash. Supports mock legacy hashes for seamless dev migration.
     """
-    return hashed_password == f"mock_hashed_{plain_password}"
+    if hashed_password.startswith("mock_hashed_"):
+        return hashed_password == f"mock_hashed_{plain_password}"
+    try:
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception:
+        return False
 
 def create_access_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
     """
-    JWT token generation skeleton.
-    Future sprints: return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    Generates a secure JWT access token signed with HS256.
     """
-    # Returns a mock token matching frontend storage expectations
-    return f"mock_jwt_token_payload_for_{subject}"
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    payload = {
+        "exp": expire,
+        "sub": str(subject)
+    }
+    encoded_jwt = jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    return encoded_jwt

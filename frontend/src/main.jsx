@@ -24,10 +24,28 @@
 
   const getCurrentEmailSuffix = () => {
     const token = originalGetItem('token');
-    if (token && token.startsWith("mock_jwt_token_payload_for_")) {
+    if (!token) return '';
+    
+    // 1. Check if mock token
+    if (token.startsWith("mock_jwt_token_payload_for_")) {
       const email = token.replace("mock_jwt_token_payload_for_", "");
       return `_${email}`;
     }
+    
+    // 2. Decode real JWT token to get email namespace
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payloadDecoded = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'));
+        const parsed = JSON.parse(payloadDecoded);
+        if (parsed.sub) {
+          return `_${parsed.sub}`;
+        }
+      }
+    } catch (e) {
+      // Ignore parsing errors
+    }
+    
     return '';
   };
 

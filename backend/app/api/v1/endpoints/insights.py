@@ -5,6 +5,7 @@ import urllib.request
 import json
 import os
 import logging
+from app.api.v1.endpoints.ai import call_gemini_api
 
 router = APIRouter()
 logger = logging.getLogger("uvicorn.error")
@@ -51,7 +52,15 @@ def generate_monthly_summary(data: MonthlySummaryRequest):
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key or api_key == "mock_api_key_placeholder":
         logger.warning("GEMINI_API_KEY is missing or placeholder. Running monthly fallback.")
-        return {"summary": monthly_heuristic_summary(reflections_list), "is_fallback": True}
+        fallback = monthly_heuristic_summary(reflections_list)
+        return {
+            "success": True,
+            "message": "Monthly summary generated via fallback heuristics.",
+            "data": {
+                "summary": fallback,
+                "is_fallback": True
+            }
+        }
 
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
     
@@ -80,18 +89,25 @@ Instructions:
     }
 
     try:
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode('utf-8'),
-            headers={'Content-Type': 'application/json'},
-            method='POST'
-        )
-        with urllib.request.urlopen(req, timeout=15) as response:
-            res_data = response.read().decode('utf-8')
-            res_json = json.loads(res_data)
-            content = res_json['candidates'][0]['content']['parts'][0]['text']
-            return {"summary": content.strip(), "is_fallback": False}
+        res_json = call_gemini_api(url, payload, timeout=15, max_attempts=2)
+        content = res_json['candidates'][0]['content']['parts'][0]['text']
+        return {
+            "success": True,
+            "message": "Monthly summary generated successfully.",
+            "data": {
+                "summary": content.strip(),
+                "is_fallback": False
+            }
+        }
     except Exception as e:
         logger.error(f"Gemini monthly summary failed: {e}. Falling back to heuristics.")
 
-    return {"summary": monthly_heuristic_summary(reflections_list), "is_fallback": True}
+    fallback = monthly_heuristic_summary(reflections_list)
+    return {
+        "success": True,
+        "message": "Monthly summary generated via fallback heuristics.",
+        "data": {
+            "summary": fallback,
+            "is_fallback": True
+        }
+    }
