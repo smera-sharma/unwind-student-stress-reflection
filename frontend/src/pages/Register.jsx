@@ -103,10 +103,6 @@ const Register = () => {
             </div>
           </div>
 
-          <div className="text-xs text-slate-400 bg-slate-50 border border-slate-100 p-3 rounded-lg">
-            ℹ️ <span className="font-semibold">Skeleton Mock signup:</span> Fills local credentials instantly. No server validation is executed.
-          </div>
-
           <div>
             <button
               type="submit"

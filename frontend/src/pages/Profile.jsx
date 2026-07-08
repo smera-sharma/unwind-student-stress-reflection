@@ -230,7 +230,19 @@ const Profile = () => {
 
   const handleDeleteAccount = () => {
     if (window.confirm("Are you absolutely sure you want to delete your account? This action is permanent.")) {
-      localStorage.clear();
+      if (user && user.email) {
+        const suffix = `_${user.email}`;
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.endsWith(suffix)) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+      }
+      localStorage.removeItem('token');
+      logout();
       showToast('🗑 Account Deleted', 'Redirecting you...');
       setTimeout(() => {
         window.location.href = '/';

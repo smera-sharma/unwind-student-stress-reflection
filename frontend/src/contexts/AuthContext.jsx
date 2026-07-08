@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
       const emailPrefix = data.email.split('@')[0];
       const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
       setUser({
-        id: data.id || 1,
+        id: data.id,
         email: data.email,
         fullName: data.full_name || defaultName,
         displayName: data.display_name || defaultName,
@@ -29,22 +29,9 @@ export const AuthProvider = ({ children }) => {
         preferredPronouns: data.preferred_pronouns || '',
       });
     } catch (e) {
-      console.warn("fetchProfile API call failed, falling back to local user context:", e);
-      const tokenVal = safeStorage.getItem('token', '');
-      const email = tokenVal.startsWith("mock_jwt_token_payload_for_") 
-        ? tokenVal.replace("mock_jwt_token_payload_for_", "") 
-        : "user@unwind.com";
-      const emailPrefix = email.split('@')[0];
-      const defaultName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-      setUser({
-        id: 1,
-        email: email,
-        fullName: defaultName,
-        displayName: defaultName,
-        bio: '',
-        profilePicture: '🌱',
-        preferredPronouns: '',
-      });
+      console.error("[Auth] fetchProfile API call failed:", e);
+      setUser(null);
+      throw e;
     }
   };
 
@@ -58,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       if (import.meta.env.DEV) {
         console.log("[Auth] Session validation started (profile fetch request trigger).");
       }
-      fetchProfile().finally(() => setIsLoading(false));
+      fetchProfile().catch(() => {}).finally(() => setIsLoading(false));
     } else {
       if (import.meta.env.DEV) {
         console.log("[Auth] Session validation skipped (no active storage token found).");
@@ -87,30 +74,15 @@ export const AuthProvider = ({ children }) => {
         return { success: true };
       }
     } catch (e) {
+      console.warn("Backend login failed:", e);
       const isValidationError = e.response && (e.response.status === 401 || e.response.status === 400);
       if (isValidationError) {
-        console.warn("[Auth] Backend rejected credentials with 401/400. Skipping mock fallback.");
         setIsLoading(false);
         return { success: false, error: 'Invalid email or password.' };
       }
-      
-      console.warn("Backend connection failed or timed out. Attempting local mock credentials fallback:", e);
-      if (email && password) {
-        const mockToken = `mock_jwt_token_payload_for_${email}`;
-        if (import.meta.env.DEV) {
-          console.log("[Auth] Fallback login success! Generated mock token.");
-        }
-        safeStorage.setItem('token', mockToken);
-        if (import.meta.env.DEV) {
-          console.log("[Auth] Mock token stored securely in safeStorage.");
-        }
-        await fetchProfile();
-        setIsLoading(false);
-        return { success: true };
-      }
     }
     setIsLoading(false);
-    return { success: false, error: 'Invalid credentials' };
+    return { success: false, error: 'Invalid credentials or connection error' };
   };
 
   const register = async (email, password, fullName) => {
@@ -127,14 +99,7 @@ export const AuthProvider = ({ children }) => {
         return login(email, password);
       }
     } catch (e) {
-      console.warn("Backend registration failed, registering locally:", e);
-      if (email && password && fullName) {
-        const mockToken = `mock_jwt_token_payload_for_${email}`;
-        safeStorage.setItem('token', mockToken);
-        await fetchProfile();
-        setIsLoading(false);
-        return { success: true };
-      }
+      console.warn("Backend registration failed:", e);
     }
     setIsLoading(false);
     return { success: false, error: 'Registration failed' };

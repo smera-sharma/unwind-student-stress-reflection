@@ -1,3 +1,9 @@
+// One-time localStorage reset check to clean development state
+if (!window.localStorage.getItem('unwind_reset_v1')) {
+  window.localStorage.clear();
+  window.localStorage.setItem('unwind_reset_v1', 'true');
+}
+
 // Intercept localStorage to namespace keys per logged-in user to prevent overlaps
 (() => {
   const originalGetItem = window.localStorage.getItem.bind(window.localStorage);
@@ -7,6 +13,7 @@
   const userSpecificKeys = [
     'theme',
     'aiReflectionCache',
+    'monthlySummaryCache',
     'todayJournal',
     'lastCompanionMessage',
     'reflectionHistory',
@@ -18,6 +25,7 @@
     'luna_intro_dismissed',
     'todayMood',
     'lastNotificationTriggerDate',
+    'continue_reading_article_id',
     'chat_',
     'habitTracker_'
   ];
@@ -26,13 +34,7 @@
     const token = originalGetItem('token');
     if (!token) return '';
     
-    // 1. Check if mock token
-    if (token.startsWith("mock_jwt_token_payload_for_")) {
-      const email = token.replace("mock_jwt_token_payload_for_", "");
-      return `_${email}`;
-    }
-    
-    // 2. Decode real JWT token to get email namespace
+    // Decode real JWT token to get email namespace
     try {
       const parts = token.split('.');
       if (parts.length === 3) {

@@ -42,19 +42,11 @@ def get_current_user(
             detail="Token has expired. Please log in again.",
         )
     except InvalidTokenError as e:
-        # 2. Fallback to mock prefix for development/offline testing compatibility
-        if token.startswith("mock_jwt_token_payload_for_"):
-            email = token.replace("mock_jwt_token_payload_for_", "")
-            logger.info(f"[Auth] Mock validation fallback. Subject/Email: {email}")
-        elif token == "mock_jwt_token_payload":
-            email = "user@unwind.com"
-            logger.info(f"[Auth] Mock validation fallback. Subject/Email: {email}")
-        else:
-            logger.warning(f"[Auth] Token validation failed: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Could not validate credentials",
-            )
+        logger.warning(f"[Auth] Token validation failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
 
     if not email:
         logger.warning("[Auth] Token validation failed: Subject/Email not found in payload")
@@ -66,18 +58,10 @@ def get_current_user(
     # Query matching user in database
     user = db.query(User).filter(User.email == email).first()
     if not user:
-        # Create a new user for this email on the fly to support offline/mock credentials isolation
-        display_name = email.split('@')[0].capitalize()
-        user = User(
-            email=email,
-            hashed_password="mock_hashed_password",
-            full_name=display_name,
-            display_name=display_name,
-            is_active=True,
-            theme="system"
+        logger.warning(f"[Auth] Token validation failed: User {email} not found in database")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
 
     return user

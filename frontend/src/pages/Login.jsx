@@ -88,10 +88,6 @@ const Login = () => {
             </div>
           </div>
 
-          <div className="text-xs text-slate-400 bg-slate-50 border border-slate-100 p-3 rounded-lg">
-            ℹ️ <span className="font-semibold">Skeleton Mock auth:</span> Any inputs will log you in locally. JWT tokens will save to local storage.
-          </div>
-
           <div>
             <button
               type="submit"

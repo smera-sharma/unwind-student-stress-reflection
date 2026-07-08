@@ -94,7 +94,7 @@ api.interceptors.response.use(
         const hasToken = token && token !== 'null' && token !== 'undefined' && token !== '';
         
         if (hasToken && !isAuthEndpoint) {
-          title = "Session Expired";
+          title = "Session Expired (401)";
           message = "Your session has expired. Please log in again.";
           if (import.meta.env.DEV) {
             console.log("[Auth] Logout reason: Received 401 Unauthorized from backend endpoint with active session.");
@@ -111,19 +111,19 @@ api.interceptors.response.use(
           return Promise.reject(error);
         }
       } else if (status === 403) {
-        title = "Access Denied";
-        message = "You don't have permission to perform this action.";
+        title = "Access Denied (403)";
+        message = backendMsg || "You don't have permission to perform this action.";
         triggerToast(title, message);
       } else if (status === 404) {
-        title = "Not Found";
-        message = "The requested resource could not be found.";
+        title = "Not Found (404)";
+        message = backendMsg || "The requested resource could not be found.";
         triggerToast(title, message);
       } else if (status >= 500) {
-        title = "Server Error";
-        message = "The server encountered an error. Please try again in a few moments.";
+        title = `Server Error (${status})`;
+        message = backendMsg || "The server encountered an error. Please try again in a few moments.";
         triggerToast(title, message);
       } else {
-        title = `Error (${status})`;
+        title = `API Error (${status})`;
         message = backendMsg || "An unexpected error occurred.";
         triggerToast(title, message);
       }
@@ -132,6 +132,8 @@ api.interceptors.response.use(
       message = "The request took too long. Please check your connection and try again.";
       triggerToast(title, message);
     } else {
+      title = "Network Error";
+      message = error.message || "We're having trouble connecting to the Unwind server right now.";
       triggerToast(title, message);
     }
     return Promise.reject(error);
