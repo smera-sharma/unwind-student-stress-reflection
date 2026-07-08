@@ -1,105 +1,143 @@
-# 🌿 Unwind – AI-Powered Student Stress Reflection Platform
+# 🌿 Unwind – AI-Powered Student Wellness Platform
 
-Unwind is a full-stack AI-powered web application designed to help students monitor their mental well-being, reflect on their academic journey, and receive personalized insights through intelligent analysis.
+> An intelligent wellness platform that helps students manage stress, organize their academic life, and build healthier habits through AI-powered assistance.
 
-This project combines psychology, data analytics, and artificial intelligence to provide a safe and insightful self-reflection experience while maintaining user privacy.
+## 🌐 Live Demo
 
----
+**Frontend:** https://unwind-student-stress-reflection.vercel.app/
 
-## 🚀 Project Vision
-
-College students often experience stress, burnout, and anxiety but lack accessible tools to regularly monitor their mental health.
-
-Unwind aims to bridge this gap by providing:
-
-- 🧠 AI-powered emotional reflection
-- 📊 Stress trend visualization
-- 📅 Weekly psychological check-ins
-- 💡 Personalized wellness recommendations
-- 🤝 Anonymous peer coping strategies
-- 📈 Progress tracking over time
+**Backend API:** https://unwind-backend-dq7t.onrender.com/docs
 
 ---
 
-# ✨ Features (Planned)
+## 📌 Overview
 
-- User Authentication (JWT)
-- Secure Login & Registration
-- Weekly PSS (Perceived Stress Scale) Check-ins
-- Mood Tracking
-- AI Reflection Summaries
-- Personalized Recommendations
-- Stress Analytics Dashboard
-- Calendar & Habit Tracking
-- Anonymous Peer Strategy Sharing
-- Admin Analytics Dashboard
+Unwind is a full-stack AI web application designed to improve student well-being and productivity.
+
+It combines journaling, mood tracking, an AI problem-solving companion, calendar management, personalized insights, and wellness resources into one modern platform.
+
+Unlike traditional wellness apps, Unwind focuses on helping students organize their thoughts, reflect on their progress, and solve academic or productivity challenges with AI assistance.
 
 ---
 
-# 🏗 Tech Stack
+# ✨ Features
+
+### 🔐 Authentication
+
+* Secure JWT Authentication
+* User Registration & Login
+* Protected Routes
+* Persistent Sessions
+
+### 📊 Dashboard
+
+* Personalized Welcome Screen
+* Daily Mood Tracking
+* Activity Overview
+* Productivity Statistics
+* Streak Tracking
+
+### 🤖 Luna — AI Companion
+
+* AI-powered academic & productivity assistant
+* Problem-solving conversations
+* Reflection support
+* Study planning assistance
+* Built using Google Gemini
+
+### 📖 Journal
+
+* Create journal entries
+* Reflection history
+* Mood logging
+* Personal growth tracking
+
+### 📅 Calendar
+
+* Schedule academic tasks
+* Event management
+* Daily planning
+
+### 📈 Insights
+
+* Mood trends
+* Productivity analytics
+* Weekly summaries
+* Personal progress visualization
+
+### 📚 Resources
+
+* Curated wellness resources
+* Study techniques
+* Mental wellness content
+* Productivity guidance
+
+### 👤 User Profile
+
+* Profile customization
+* Display name editing
+* Personalized experience
+
+---
+
+# 🛠 Tech Stack
 
 ## Frontend
 
-- React (Vite)
-- Tailwind CSS
-- React Router
-- Axios
+* React.js
+* Vite
+* React Router
+* Axios
+* CSS
 
 ## Backend
 
-- FastAPI
-- SQLAlchemy
-- SQLite
-- Pydantic
-- JWT Authentication
+* FastAPI
+* SQLAlchemy
+* JWT Authentication
+* Pydantic
+* SQLite
 
 ## AI
 
-- OpenAI API (Planned)
-- Sentiment Analysis
-- Reflection Summarization
-- Personalized Recommendation Engine
+* Google Gemini API
 
-## Development Tools
+## Deployment
 
-- Git
-- GitHub
-- VS Code
-- Postman / Swagger UI
+* Frontend → Vercel
+* Backend → Render
 
 ---
 
 # 📂 Project Structure
 
 ```
-UNWIND
+Unwind/
 │
 ├── frontend/
 │   ├── src/
-│   ├── components/
-│   ├── pages/
-│   ├── services/
-│   └── routes/
+│   ├── public/
+│   └── ...
 │
 ├── backend/
 │   ├── app/
 │   ├── api/
-│   ├── core/
 │   ├── models/
 │   ├── schemas/
-│   └── services/
+│   └── ...
 │
 └── README.md
 ```
 
 ---
 
-# ⚙️ Getting Started
+# 🚀 Running Locally
 
-## Clone the repository
+## Clone Repository
 
 ```bash
-git clone https://github.com/smera-sharma/unwind-student-stress-reflection.git
+git clone <repository-url>
+cd <repository-name>
 ```
 
 ## Backend
@@ -109,27 +147,14 @@ cd backend
 
 python -m venv .venv
 
+source .venv/bin/activate
 # Windows
 .venv\Scripts\activate
 
 pip install -r requirements.txt
 
-python -m uvicorn app.main:app --reload
+uvicorn app.main:app --reload
 ```
-
-Backend runs on:
-
-```
-http://127.0.0.1:8000
-```
-
-Swagger Docs:
-
-```
-http://127.0.0.1:8000/docs
-```
-
----
 
 ## Frontend
 
@@ -141,68 +166,58 @@ npm install
 npm run dev
 ```
 
-Frontend runs on:
+---
+
+# 🔑 Environment Variables
+
+### Backend
 
 ```
-http://localhost:5173
+DATABASE_URL=
+SECRET_KEY=
+GEMINI_API_KEY=
+```
+
+### Frontend
+
+```
+VITE_API_URL=
 ```
 
 ---
 
-# 📅 Development Roadmap
+# 📸 Screenshots
 
-- [x] Project Foundation
-- [ ] Authentication System
-- [ ] User Dashboard
-- [ ] Weekly PSS Check-ins
-- [ ] Reflection Journal
-- [ ] AI Summaries
-- [ ] Personalized Recommendations
-- [ ] Mood Analytics
-- [ ] Calendar Integration
-- [ ] Peer Strategy Sharing
-- [ ] Testing
-- [ ] Deployment
+*Add screenshots of:*
+
+* Login
+* Dashboard
+* Luna AI
+* Journal
+* Calendar
+* Insights
 
 ---
 
-# 🎯 Learning Goals
+# 🔮 Future Enhancements
 
-This project is being built to strengthen skills in:
-
-- Full Stack Development
-- REST API Design
-- Authentication & Security
-- Database Design
-- AI Integration
-- UI/UX Design
-- Software Architecture
-- Git & GitHub Workflow
+* Notifications & reminders
+* Goal tracking
+* AI-powered habit recommendations
+* Cloud database migration
+* Mobile application
+* Peer support communities
 
 ---
 
-# 🤝 Contributing
+# 👩‍💻 Author
 
-This project is currently being developed as a personal portfolio project.
+**smmera sharrma**
 
-Feedback and suggestions are always welcome.
-
----
-
-# 📄 License
-
-This project is licensed under the MIT License.
+GitHub: https://github.com/smera-sharma
 
 ---
 
-## 👩‍💻 Author
+# ⭐ If you like this project
 
-**Eshniie Sharma**
-
-B.Tech Computer Science Engineering Student
-
-Building AI-driven applications focused on human-centered technology, mental well-being, and ethical AI.
-
----
-
-⭐ If you found this project interesting, consider giving it a star!git 
+Please consider giving it a ⭐ on GitHub!
