@@ -14,7 +14,6 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
-    # CORS settings to allow frontend communication
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
@@ -24,6 +23,7 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5174",
         "http://localhost:5175",
         "http://127.0.0.1:5175",
+        "https://unwind-student-stress-reflection.vercel.app",
     ]
 
     # Look for .env file at the workspace root or backend root

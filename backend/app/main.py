@@ -75,6 +75,20 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+def get_cors_headers(request):
+    origin = request.headers.get("origin")
+    if origin:
+        allowed_origins = [str(o) for o in settings.BACKEND_CORS_ORIGINS]
+        is_allowed = origin in allowed_origins or any(p in origin for p in ["localhost", "127.0.0.1", "vercel.app"])
+        if is_allowed:
+            return {
+                "Access-Control-Allow-Origin": origin,
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "*",
+                "Access-Control-Allow-Headers": "*",
+            }
+    return {}
+
 # Exception handler for FastAPI HTTPException
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc: HTTPException):
@@ -95,7 +109,8 @@ async def http_exception_handler(request, exc: HTTPException):
             "success": False,
             "message": exc.detail,
             "error_code": error_code
-        }
+        },
+        headers=get_cors_headers(request)
     )
 
 # Exception handler for Pydantic Request Validation Errors
@@ -109,7 +124,8 @@ async def validation_exception_handler(request, exc: RequestValidationError):
             "message": "Request validation failed. Invalid request format.",
             "error_code": "VALIDATION_ERROR",
             "details": exc.errors()
-        }
+        },
+        headers=get_cors_headers(request)
     )
 
 # Catch-all Exception handler for unexpected errors (never expose stack traces)
@@ -122,7 +138,8 @@ async def global_exception_handler(request, exc: Exception):
             "success": False,
             "message": "Unable to process your request.",
             "error_code": "INTERNAL_SERVER_ERROR"
-        }
+        },
+        headers=get_cors_headers(request)
     )
 
 # Set up CORS middleware origins
