@@ -56,8 +56,7 @@ const Resources = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   
-  // Bookmarks
-  const bookmarksKey = user ? `unwind_bookmarks_${user.email}` : 'unwind_bookmarks_guest';
+  const bookmarksKey = 'unwind_bookmarks';
   const [bookmarkedIds, setBookmarkedIds] = useState([]);
   
   // Modals / active views

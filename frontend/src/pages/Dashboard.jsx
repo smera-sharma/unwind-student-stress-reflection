@@ -43,30 +43,21 @@ const Dashboard = () => {
 
   const [weeklyMood, setWeeklyMood] = useState(() => {
     const saved = localStorage.getItem('weeklyMood');
-    return saved ? JSON.parse(saved) : [4, 5, 3, 2, 5, 4, 3];
+    return saved ? JSON.parse(saved) : [0, 0, 0, 0, 0, 0, 0];
   });
 
   const [checkInCount, setCheckInCount] = useState(() => {
-    return parseInt(localStorage.getItem('checkInCount') || '4', 10);
+    return parseInt(localStorage.getItem('checkInCount') || '0', 10);
   });
 
   const [streak, setStreak] = useState(() => {
-    return parseInt(localStorage.getItem('reflectionStreak') || '4', 10);
+    return parseInt(localStorage.getItem('reflectionStreak') || '0', 10);
   });
 
-  // Load and seed Reflection History if empty on load
+  // Load Reflection History if empty on load
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem('reflectionHistory');
-    if (saved) return JSON.parse(saved);
-
-    const mockHistory = [
-      { date: 'Thursday, July 2', mood: 'Good', text: 'Finished the research paper outline today. Felt good to get that milestone out of the way.' },
-      { date: 'Wednesday, July 1', mood: 'Stressed', text: 'Midterm exam prep is taking up all my energy. I feel stressed and tired.' },
-      { date: 'Tuesday, June 30', mood: 'Neutral', text: 'A normal day. Attended lectures, read at the library, and walked around the park.' },
-      { date: 'Monday, June 29', mood: 'Amazing', text: 'Had a wonderful lunch with college friends. We talked about summer break plans and laughed a lot.' }
-    ];
-    localStorage.setItem('reflectionHistory', JSON.stringify(mockHistory));
-    return mockHistory;
+    return saved ? JSON.parse(saved) : [];
   });
 
   const [toast, setToast] = useState(null);

@@ -36,16 +36,11 @@ const Calendar = () => {
   useEffect(() => {
     // 1. Get reflection history
     const savedHistory = localStorage.getItem('reflectionHistory');
-    const historyList = savedHistory ? JSON.parse(savedHistory) : [
-      { date: 'Thursday, July 2', mood: 'Good', text: 'Finished the research paper outline today. Felt good to get that milestone out of the way.' },
-      { date: 'Wednesday, July 1', mood: 'Stressed', text: 'Midterm exam prep is taking up all my energy. I feel stressed and tired.' },
-      { date: 'Tuesday, June 30', mood: 'Neutral', text: 'A normal day. Attended lectures, read at the library, and walked around the park.' },
-      { date: 'Monday, June 29', mood: 'Amazing', text: 'Had a wonderful lunch with college friends. We talked about summer break plans and laughed a lot.' }
-    ];
+    const historyList = savedHistory ? JSON.parse(savedHistory) : [];
     setHistory(historyList);
 
     // 2. Get streak
-    const savedStreak = parseInt(localStorage.getItem('reflectionStreak') || '4', 10);
+    const savedStreak = parseInt(localStorage.getItem('reflectionStreak') || '0', 10);
     setStreak(savedStreak);
 
     // 3. Load daily habits checklist

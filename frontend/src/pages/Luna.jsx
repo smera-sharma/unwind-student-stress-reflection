@@ -20,7 +20,7 @@ const Luna = () => {
 
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
-  const chatKey = user ? `unwind_chats_${user.email}` : 'unwind_chats_guest';
+  const chatKey = 'unwind_chats';
 
   // 1. Initial Load of Chat Histories
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import Card from '../ui/Card';
 
-const AchievementsCard = ({ history = [], streak = 4, checkInCount = 4 }) => {
+const AchievementsCard = ({ history = [], streak = 0, checkInCount = 0 }) => {
   const milestones = [
     { id: 'first', label: "First Reflection", icon: "🌱", desc: "Write your first entry.", unlocked: history.length >= 1 },
     { id: 'five', label: "Five Reflections", icon: "📖", desc: "Write five reflections.", unlocked: history.length >= 5 },

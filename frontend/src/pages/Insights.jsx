@@ -22,7 +22,7 @@ import html2canvas from 'html2canvas';
 const Insights = () => {
   const reportRef = useRef(null);
   const [history, setHistory] = useState([]);
-  const [streak, setStreak] = useState(4);
+  const [streak, setStreak] = useState(0);
   const [summary, setSummary] = useState('');
   const [isLoadingSummary, setIsLoading] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -31,16 +31,11 @@ const Insights = () => {
   // Load centralized localStorage states
   useEffect(() => {
     // 1. Get reflection history
-    const historyList = safeStorage.getItem('reflectionHistory') || [
-      { date: 'Thursday, July 2', mood: 'Good', text: 'Finished the research paper outline today. Felt good to get that milestone out of the way.' },
-      { date: 'Wednesday, July 1', mood: 'Stressed', text: 'Midterm exam prep is taking up all my energy. I feel stressed and tired.' },
-      { date: 'Tuesday, June 30', mood: 'Neutral', text: 'A normal day. Attended lectures, read at the library, and walked around the park.' },
-      { date: 'Monday, June 29', mood: 'Amazing', text: 'Had a wonderful lunch with college friends. We talked about summer break plans and laughed a lot.' }
-    ];
+    const historyList = safeStorage.getItem('reflectionHistory') || [];
     setHistory(historyList);
 
     // 2. Get streak
-    const savedStreak = parseInt(safeStorage.getItem('reflectionStreak', '4'), 10);
+    const savedStreak = parseInt(safeStorage.getItem('reflectionStreak', '0'), 10);
     setStreak(savedStreak);
   }, []);
 
